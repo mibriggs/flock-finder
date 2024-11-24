@@ -6,6 +6,7 @@
     
     let filedDropZone: HTMLElement;
     let birds: EBirdEntry[] = $state([]);
+    let count: number[] = $state([]);
     
     const doNothingOnDrag = (e: DragEvent) => {
         e.stopPropagation();
@@ -49,11 +50,22 @@
             fileRows.forEach((row, indx) => {
                 if (indx > 0 && row !== '') {
                     const rowArray = row.split(',')
-                    const birdData = new EBirdEntry(rowArray[0], rowArray[1], parseInt(rowArray[4]), rowArray[5], 
-                    rowArray[7], rowArray[8], parseFloat(rowArray[9]), parseFloat(rowArray[10]));
-                    birds.push(birdData);
+                    
+                    const birdIndex: number = birds.findIndex((birdEntry) => birdEntry.commonName === rowArray[1]);
+                    if (birdIndex !== -1) { // currently grouping all same birds together to reduce data a bit lol
+                        count[birdIndex] = count[birdIndex] + 1
+                    }
+                    else {
+                        const birdData: EBirdEntry = new EBirdEntry(rowArray[0], rowArray[1], parseInt(rowArray[4]), rowArray[5], 
+                        rowArray[7], rowArray[8], parseFloat(rowArray[9]), parseFloat(rowArray[10]));
+                        count.push(1);
+                        birds.push(birdData);
+                    }
                 }
             });
+            const indices: number[] = count.map((_, index) => index).sort((a, b) => count[b] - count[a]);
+            count = indices.map(index => count[index]);
+            birds = indices.map(index => birds[index]);
         })
         .catch(error => console.error(error));
     }
@@ -74,19 +86,17 @@
     const allowedFiles: string[] = [".csv"];
 </script>
 
-<main class="flex justify-center items-center pt-12">
-    <div class=" flex flex-col gap-4">
-        {#each birds as bird}
+<main class="flex flex-col justify-center items-center p-8 gap-3">
+    <div class="flex flex-wrap gap-4">
+        {#each birds as bird, indx}
             <div class="bg-gray-200 rounded-md p-2">
                 <div>Name: {bird.commonName}</div>
-                <div>Location: {bird.location}</div>
-                <div>Lattitude and Longitude: {bird.lattitude} & {bird.longitude}</div>
+                <div>Seen: {count[indx]} time(s)</div>
             </div>
         {/each}
     </div>
 
-
-    <label for="fileUpload" class="flex flex-col items-center justify-center border-dashed border-[3px] border-gray-400 rounded-lg p-8 bg-gray-100 text-gray-600 hover:opacity-70 active:border-green-500 cursor-pointer select-none" bind:this={filedDropZone} draggable="false">
+    <label for="fileUpload" class="my-8 flex flex-col items-center justify-center border-dashed border-[3px] border-gray-400 rounded-lg p-8 bg-gray-100 text-gray-600 hover:opacity-70 active:border-green-500 cursor-pointer select-none" bind:this={filedDropZone} draggable="false">
         <Upload size="32"/>
         <div class=" text-xl">
             <span class=" font-bold">Upload a file</span>
