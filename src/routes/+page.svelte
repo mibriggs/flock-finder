@@ -2,7 +2,7 @@
 	import { readFile } from '$lib';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
 	import { EBirdEntry } from '$lib/eBirdEntry';
-	import { fileLoadingEvent } from '$lib/fileLoadingEvent.svelte';
+	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
 	import { toast } from 'svoast';
 
 	let filedDropZone: HTMLElement | undefined = $state();
@@ -98,36 +98,24 @@
 			filedDropZone.ondragover = doNothingOnDrag;
 			filedDropZone.ondrop = handleFileDrag;
 		}
-	});
 
-	$effect(() => console.log(fileLoadingEvent.shouldShowLoadingScreen));
+		return () => fileLoadTracker.reset();
+	});
 
 	const allowedFiles: string[] = ['.csv'];
 </script>
 
-<main class="flex flex-col items-center justify-center gap-3 p-8">
-	<div class="flex flex-wrap gap-4">
-		{#each birds as bird, indx}
-			<div class="rounded-md bg-gray-200 p-2">
-				<div>Name: {bird.commonName}</div>
-				<div>Seen: {count[indx]} time(s)</div>
-			</div>
-		{/each}
-	</div>
+<main class="flex h-screen w-screen flex-col items-center gap-3 p-8">
+	{#if fileLoadTracker.loadComplete}
+		<div id="map" class="h-48">Map goes here</div>
+	{/if}
 
-	{#if fileLoadingEvent.shouldShowLoadingScreen}
-		<div class="flex flex-col">
-			<div class="text-9xl">Loading...</div>
-			<div class="text-9xl">Loading...</div>
-			<div class="text-9xl">Loading...</div>
-			<div class="text-9xl">Loading...</div>
-			<div class="text-9xl">Loading...</div>
-			<div class="text-9xl">Loading...</div>
-			<div class="text-9xl">Loading...</div>
-		</div>
+	{#if fileLoadTracker.currentlyLoading}
+		<div class="text-9xl">Loading...</div>
 	{/if}
 
 	<FileDropZone
+		class="mt-8"
 		allowedExtensions={allowedFiles}
 		onFileSelection={handleFileSelection}
 		bind:dropZoneContainer={filedDropZone}

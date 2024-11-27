@@ -1,12 +1,18 @@
-export class FileLoadingEvent {
-	isFileSelected = $state(false);
-	isFileLoading = $state(false);
-	shouldShowLoadingScreen: boolean = $derived<boolean>(this.isFileLoading && this.isFileSelected);
+export class FileLoadTracker {
+	isSelected = $state(false);
+	isProcessing = $state(false);
+	currentlyLoading: boolean = $derived<boolean>(this.isSelected && this.isProcessing);
+	loadComplete: boolean = $derived<boolean>(this.isSelected && !this.isProcessing);
+
+	startLoading() {
+		this.isSelected = true;
+		this.isProcessing = true;
+	}
 
 	reset() {
-		this.isFileLoading = false;
-		this.isFileSelected = false;
+		this.isProcessing = false;
+		this.isSelected = false;
 	}
 }
 
-export const fileLoadingEvent = new FileLoadingEvent();
+export const fileLoadTracker = new FileLoadTracker();

@@ -1,9 +1,10 @@
-import { fileLoadingEvent } from './fileLoadingEvent.svelte';
+import { fileLoadTracker } from './fileLoadingEvent.svelte';
 
 type DropZoneEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
 
 export interface FileDropZoneProps {
 	allowedExtensions: string[];
+	class?: string;
 	dropZoneContainer: HTMLElement | undefined;
 	onFileSelection: (e: DropZoneEvent) => Promise<void>;
 }
@@ -21,13 +22,9 @@ export function readFile(file: File): Promise<String> {
 			resolve(result as string);
 		};
 
-		fileReader.onloadstart = () => {
-			fileLoadingEvent.isFileSelected = true;
-			fileLoadingEvent.isFileLoading = true;
-			// chase us --> 18009359935
-		};
-
-		fileReader.onloadend = () => (fileLoadingEvent.isFileLoading = false);
+		fileReader.onloadstart = () => fileLoadTracker.startLoading();
+		fileReader.onloadend = () => (fileLoadTracker.isProcessing = false);
+		// chase us --> 18009359935
 
 		fileReader.onerror = () =>
 			reject(new Error(`Error reading file: ${fileReader.error?.message}`));

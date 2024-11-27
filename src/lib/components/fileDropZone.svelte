@@ -1,9 +1,11 @@
 <script lang="ts">
 	import type { FileDropZoneProps } from '$lib';
 	import { Upload } from 'lucide-svelte';
+	import { twMerge } from 'tailwind-merge';
 
 	let {
 		allowedExtensions = [],
+		class: className = '',
 		dropZoneContainer = $bindable(),
 		onFileSelection
 	}: FileDropZoneProps = $props();
@@ -15,7 +17,10 @@
 
 <label
 	for="fileUpload"
-	class="my-8 flex cursor-pointer select-none flex-col items-center justify-center rounded-lg border-[3px] border-dashed border-gray-400 bg-gray-100 p-8 text-gray-600 hover:opacity-70 active:border-green-500"
+	class={twMerge(
+		'flex cursor-pointer select-none flex-col items-center justify-center rounded-lg border-[3px] border-dashed border-gray-400 bg-gray-100 p-8 text-gray-600 hover:opacity-70 active:border-green-500',
+		className
+	)}
 	bind:this={dropZoneContainer}
 	draggable="false"
 >
