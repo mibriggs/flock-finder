@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { readFile } from '$lib';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
+	import MapPanel from '$lib/components/mapPanel.svelte';
 	import { EBirdEntry } from '$lib/eBirdEntry';
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
 	import { toast } from 'svoast';
@@ -107,7 +108,7 @@
 
 <main class="flex h-screen w-screen flex-col items-center gap-3 p-8">
 	{#if fileLoadTracker.loadComplete}
-		<div id="map">Map goes here</div>
+		<MapPanel />
 	{/if}
 
 	{#if fileLoadTracker.currentlyLoading}
