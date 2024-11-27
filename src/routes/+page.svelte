@@ -107,7 +107,7 @@
 
 <main class="flex h-screen w-screen flex-col items-center gap-3 p-8">
 	{#if fileLoadTracker.loadComplete}
-		<div id="map" class="h-48">Map goes here</div>
+		<div id="map">Map goes here</div>
 	{/if}
 
 	{#if fileLoadTracker.currentlyLoading}
