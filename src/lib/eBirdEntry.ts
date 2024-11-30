@@ -1,44 +1,65 @@
-export class EBirdEntry {
-	submissionId: string;
-	commonName: string;
-	// scientificName?: string; // TODO not optional
-	// taxonomicOrder?: number; // TODO not optional
-	count: number;
-	stateOrProvince: string;
-	// county?: string;
-	locationId: string;
-	location: string;
-	lattitude: number;
-	longitude: number;
-	// date?: Date; // also has a time but i think this encompasses that? // TODO not optional
-	// protocol?: string; // TODO not optional
-	// durationInMinutes?: number;
-	// allObsReported?: number; // TODO not optional
-	// distanceTraveledInKm?: number;
-	// areaCovered?: number;
-	// numObservers?: number; // TODO not optional
-	// breedingCode?: string;
-	// observationDetails?: string;
-	// checklistComments?: string;
-	// mlCatalogNumber?: number;
+import {
+	any,
+	array,
+	date,
+	number,
+	object,
+	optional,
+	pipe,
+	string,
+	transform,
+	unknown,
+	type InferOutput
+} from 'valibot';
 
-	constructor(
-		submissionId: string,
-		commonName: string,
-		count: number,
-		stateOrProvince: string,
-		locationId: string,
-		location: string,
-		lattitude: number,
-		longitude: number
-	) {
-		this.submissionId = submissionId;
-		this.commonName = commonName;
-		this.count = count;
-		this.stateOrProvince = stateOrProvince;
-		this.locationId = locationId;
-		this.location = location;
-		this.lattitude = lattitude;
-		this.longitude = longitude;
-	}
-}
+export const birdSchema = object({
+	submissionId: string(),
+	commonName: string(),
+	scientificName: string(),
+	taxonomicOrder: number(),
+	count: pipe(
+		unknown(),
+		transform((count) => {
+			if (typeof count === 'string') {
+				return undefined;
+			}
+			return count as number;
+		}),
+		optional(number())
+	), // undefined here means that there was an unspecified number of birds seen (at least one but cannot be sure)
+	stateOrProvince: string(),
+	county: optional(string()),
+	locationId: string(),
+	location: string(),
+	latitude: number(),
+	longitude: number(),
+	date: pipe(
+		string(),
+		transform((dateString) => new Date(dateString)),
+		date()
+	),
+	time: optional(string()),
+	protocol: string(),
+	durationInMinutes: optional(number()),
+	allObsReported: number(),
+	distanceTraveledInKm: optional(number()),
+	areaCovered: optional(number()),
+	numObservers: optional(number()),
+	breedingCode: optional(string()),
+	observationDetails: optional(string()),
+	checklistComments: optional(string()),
+	mlCatalogNumbers: pipe(
+		unknown(),
+		transform((catalogNumbers) => {
+			let newArray: number[] = [];
+			if (typeof catalogNumbers === 'string') {
+				newArray = catalogNumbers.split(' ').map((asString) => parseInt(asString));
+			}
+			if (typeof catalogNumbers === 'number') newArray = [catalogNumbers as number];
+			return newArray;
+		}),
+		array(number())
+	)
+});
+
+export type EBirdEntry = InferOutput<typeof birdSchema>;

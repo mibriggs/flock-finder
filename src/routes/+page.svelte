@@ -1,14 +1,13 @@
 <script lang="ts">
-	import { readFile } from '$lib';
+	import { readCsvFile, readFile } from '$lib';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
 	import MapPanel from '$lib/components/mapPanel.svelte';
-	import { EBirdEntry } from '$lib/eBirdEntry';
+	import { type EBirdEntry } from '$lib/eBirdEntry';
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
 	import { toast } from 'svoast';
 
 	let filedDropZone: HTMLElement | undefined = $state();
 	let birds: EBirdEntry[] = $state([]);
-	let count: number[] = $state([]);
 
 	const doNothingOnDrag = (e: DragEvent) => {
 		e.stopPropagation();
@@ -42,48 +41,18 @@
 			return;
 		}
 
-		const file = files[0];
-		if (file.type !== 'text/csv') {
+		const userFile = files[0];
+		if (userFile.type !== 'text/csv') {
 			await launchErrorToast('Only csv files are supported at this moment');
 			return;
 		}
 
-		await readFile(file)
-			.then((fileText) => {
-				const fileRows = fileText.split('\n');
-				fileRows.forEach((row, indx) => {
-					if (indx > 0 && row !== '') {
-						const rowArray = row.split(',');
-
-						const birdIndex: number = birds.findIndex(
-							(birdEntry) => birdEntry.commonName === rowArray[1]
-						);
-						if (birdIndex !== -1) {
-							// currently grouping all same birds together to reduce data a bit lol
-							count[birdIndex] = count[birdIndex] + 1;
-						} else {
-							const birdData: EBirdEntry = new EBirdEntry(
-								rowArray[0],
-								rowArray[1],
-								parseInt(rowArray[4]),
-								rowArray[5],
-								rowArray[7],
-								rowArray[8],
-								parseFloat(rowArray[9]),
-								parseFloat(rowArray[10])
-							);
-							count.push(1);
-							birds.push(birdData);
-						}
-					}
-				});
-				const indices: number[] = count
-					.map((_, index) => index)
-					.sort((a, b) => count[b] - count[a]);
-				count = indices.map((index) => count[index]);
-				birds = indices.map((index) => birds[index]);
-			})
-			.catch((error) => console.error(error));
+		await readFile(userFile)
+			.then((csvData) => (birds = readCsvFile(csvData)))
+			.catch((error) => {
+				console.error(error);
+				launchErrorToast(error);
+			});
 	};
 
 	const launchErrorToast = async (errorMessage: string) => {
@@ -108,7 +77,7 @@
 
 <main class="flex h-screen w-screen flex-col items-center gap-3 p-8">
 	{#if fileLoadTracker.loadComplete}
-		<MapPanel />
+		<MapPanel {birds} />
 	{/if}
 
 	{#if fileLoadTracker.currentlyLoading}
