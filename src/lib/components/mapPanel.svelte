@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { EBirdEntry } from '$lib/eBirdEntry';
-	import { Map, Marker, NavigationControl } from 'maplibre-gl';
+	import { Map, Marker, NavigationControl, Popup } from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 
 	let { birds }: { birds: EBirdEntry[] } = $props();
@@ -41,7 +41,15 @@
 		birds.forEach((bird, indx) => {
 			if (indx < 100) {
 				console.log(bird.commonName, bird.longitude, bird.latitude, bird.date);
-				new Marker().setLngLat([bird.longitude, bird.latitude]).addTo(map);
+				new Marker()
+				.setLngLat([bird.longitude, bird.latitude])
+				.setPopup(new Popup().setHTML(`
+				<div class="flex flex-col m-2 items-center justify-center">
+					<span class="font-bold text-sm">${bird.commonName}</span>
+					<span class="italic text-xs">${bird.date.toDateString()}</span>
+				</div>
+				`))
+				.addTo(map);
 			}
 		});
 
