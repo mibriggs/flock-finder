@@ -40,7 +40,6 @@
 
 		birds.forEach((bird, indx) => {
 			if (indx < 100) {
-				console.log(bird.commonName, bird.longitude, bird.latitude, bird.date);
 				new Marker()
 				.setLngLat([bird.longitude, bird.latitude])
 				.setPopup(new Popup().setHTML(`

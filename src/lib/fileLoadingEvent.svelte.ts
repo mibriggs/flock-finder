@@ -1,7 +1,7 @@
 export class FileLoadTracker {
 	isSelected = $state(false);
 	isProcessing = $state(false);
-	currentlyLoading: boolean = $derived<boolean>(this.isSelected && this.isProcessing);
+	isLoading: boolean = $derived<boolean>(this.isSelected && this.isProcessing);
 	loadComplete: boolean = $derived<boolean>(this.isSelected && !this.isProcessing);
 
 	startLoading() {

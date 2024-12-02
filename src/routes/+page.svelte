@@ -80,8 +80,8 @@
 		<MapPanel {birds} />
 	{/if}
 
-	{#if fileLoadTracker.currentlyLoading}
-		<div class="text-9xl">Loading...</div>
+	{#if fileLoadTracker.isLoading}
+		<div>Loading...</div>
 	{/if}
 
 	<FileDropZone
