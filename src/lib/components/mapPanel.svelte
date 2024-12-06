@@ -1,11 +1,15 @@
 <script lang="ts">
 	import type { EBirdEntry } from '$lib/eBirdEntry';
-	import { Map, Marker, NavigationControl, Popup } from 'maplibre-gl';
+	import { Map, NavigationControl, Popup } from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
+	import { addMarkersToMap } from '$lib';
+	import type { Feature, Point } from "geojson";
+
 
 	let { birds }: { birds: EBirdEntry[] } = $props();
 	let mapContainer: HTMLDivElement;
 	let map: Map;
+	// let lastClickedCoordinates: number[] = [];
 
 	$effect(() => {
 		map = new Map({
@@ -37,18 +41,18 @@
 		});
 
 		map.addControl(new NavigationControl());
-
-		birds.forEach((bird, indx) => {
-			if (indx < 100) {
-				new Marker()
-				.setLngLat([bird.longitude, bird.latitude])
-				.setPopup(new Popup().setHTML(`
-				<div class="flex flex-col m-2 items-center justify-center">
-					<span class="font-bold text-sm">${bird.commonName}</span>
-					<span class="italic text-xs">${bird.date.toDateString()}</span>
-				</div>
-				`))
+		map.on("load", () => addMarkersToMap(birds, map));
+		map.on("click", "marker-layer", (event) => {
+			// console.log(`Last clicked coords: ${lastClickedCoordinates}`);
+			let birdsInArea = event.features? [...event.features] : [];
+			if (birdsInArea.length > 0) {
+				const selectedBird: Feature<Point> = birdsInArea[0] as Feature<Point>;
+				const coordinates = selectedBird.geometry.coordinates;
+				new Popup().setLngLat([coordinates[0], coordinates[1]])
+				.setHTML(`<h3>${selectedBird.properties?.title}</h3><p>${selectedBird.properties?.date}</p>`)
 				.addTo(map);
+				// console.log(`Selected coords: ${coordinates}`);
+				// lastClickedCoordinates = coordinates;
 			}
 		});
 

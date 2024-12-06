@@ -2,6 +2,8 @@ import Papa from 'papaparse';
 import { fileLoadTracker } from './fileLoadingEvent.svelte';
 import { safeParse } from 'valibot';
 import { birdSchema, type EBirdEntry } from './eBirdEntry';
+import type { Map } from 'maplibre-gl';
+import type { FeatureCollection, Feature, GeoJsonProperties, Point } from "geojson";
 
 type DropZoneEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
 
@@ -109,4 +111,40 @@ export function readCsvFile(csvData: string): EBirdEntry[] {
 		}
 	});
 	return typedOutput;
+}
+
+export function addMarkersToMap(birds: EBirdEntry[], map: Map) {
+	const birdMarkers: Feature<Point, GeoJsonProperties>[] = birds.map((bird) => {
+		return {
+			type: "Feature",
+			geometry: {
+				type: "Point",
+				coordinates: [bird.longitude, bird.latitude]
+			},
+			properties: {
+				title: bird.commonName,
+				date: bird.date.toDateString()
+			}
+		}
+	});
+
+	const geoJson: FeatureCollection<Point, GeoJsonProperties> = {
+		type: "FeatureCollection",
+		features: birdMarkers
+	};
+
+	map.addSource("markers", {
+		type: "geojson",
+		data: geoJson
+	});
+
+	map.addLayer({
+		id: "marker-layer",
+		type: "circle",
+		source: "markers",
+		paint: {
+			"circle-radius": 8,
+			"circle-color": "#FF5722",
+		},
+	});
 }
