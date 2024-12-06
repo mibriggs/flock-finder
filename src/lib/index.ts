@@ -4,6 +4,8 @@ import { safeParse } from 'valibot';
 import { birdSchema, type EBirdEntry } from './eBirdEntry';
 import type { Map } from 'maplibre-gl';
 import type { FeatureCollection, Feature, GeoJsonProperties, Point } from "geojson";
+import birdImage from '$lib/assets/birdNoBg.png';
+
 
 type DropZoneEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
 
@@ -113,7 +115,7 @@ export function readCsvFile(csvData: string): EBirdEntry[] {
 	return typedOutput;
 }
 
-export function addMarkersToMap(birds: EBirdEntry[], map: Map) {
+export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 	const birdMarkers: Feature<Point, GeoJsonProperties>[] = birds.map((bird) => {
 		return {
 			type: "Feature",
@@ -138,13 +140,15 @@ export function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 		data: geoJson
 	});
 
+	const loadedBirdImage = await map.loadImage(birdImage);
+	map.addImage('birdIcon', loadedBirdImage.data);
 	map.addLayer({
 		id: "marker-layer",
-		type: "circle",
+		type: "symbol",
 		source: "markers",
-		paint: {
-			"circle-radius": 8,
-			"circle-color": "#FF5722",
+		layout: {
+			"icon-image": "birdIcon",
+			"icon-size": 0.04
 		},
 	});
 }
