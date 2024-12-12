@@ -3,9 +3,8 @@
 	import { Map, NavigationControl, Popup } from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { addMarkersToMap } from '$lib';
-	import type { Feature, Point } from "geojson";
+	import type { Feature, Point } from 'geojson';
 	import { PUBLIC_MAP_TILER_KEY } from '$env/static/public';
-
 
 	let { birds }: { birds: EBirdEntry[] } = $props();
 	let mapContainer: HTMLDivElement;
@@ -20,15 +19,18 @@
 		});
 
 		map.addControl(new NavigationControl());
-		map.on("load", () => addMarkersToMap(birds, map));
-		map.on("click", "marker-layer", (event) => {
-			let birdsInArea = event.features? [...event.features] : [];
+		map.on('load', () => addMarkersToMap(birds, map));
+		map.on('click', 'marker-layer', (event) => {
+			let birdsInArea = event.features ? [...event.features] : [];
 			if (birdsInArea.length > 0) {
 				const selectedBird: Feature<Point> = birdsInArea[0] as Feature<Point>;
 				const coordinates = selectedBird.geometry.coordinates;
-				new Popup().setLngLat([coordinates[0], coordinates[1]])
-				.setHTML(`<h3>${selectedBird.properties?.title}</h3><p>${selectedBird.properties?.date}</p>`)
-				.addTo(map);
+				new Popup()
+					.setLngLat([coordinates[0], coordinates[1]])
+					.setHTML(
+						`<h3>${selectedBird.properties?.title}</h3><p>${selectedBird.properties?.date}</p>`
+					)
+					.addTo(map);
 			}
 		});
 

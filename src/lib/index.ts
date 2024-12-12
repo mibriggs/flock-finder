@@ -3,9 +3,8 @@ import { fileLoadTracker } from './fileLoadingEvent.svelte';
 import { safeParse } from 'valibot';
 import { birdSchema, type EBirdEntry } from './eBirdEntry';
 import type { Map } from 'maplibre-gl';
-import type { FeatureCollection, Feature, GeoJsonProperties, Point } from "geojson";
+import type { FeatureCollection, Feature, GeoJsonProperties, Point } from 'geojson';
 import birdImage from '$lib/assets/birdNoBg.png';
-
 
 type DropZoneEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
 
@@ -118,37 +117,37 @@ export function readCsvFile(csvData: string): EBirdEntry[] {
 export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 	const birdMarkers: Feature<Point, GeoJsonProperties>[] = birds.map((bird) => {
 		return {
-			type: "Feature",
+			type: 'Feature',
 			geometry: {
-				type: "Point",
+				type: 'Point',
 				coordinates: [bird.longitude, bird.latitude]
 			},
 			properties: {
 				title: bird.commonName,
 				date: bird.date.toDateString()
 			}
-		}
+		};
 	});
 
 	const geoJson: FeatureCollection<Point, GeoJsonProperties> = {
-		type: "FeatureCollection",
+		type: 'FeatureCollection',
 		features: birdMarkers
 	};
 
-	map.addSource("markers", {
-		type: "geojson",
+	map.addSource('markers', {
+		type: 'geojson',
 		data: geoJson
 	});
 
 	const loadedBirdImage = await map.loadImage(birdImage);
 	map.addImage('birdIcon', loadedBirdImage.data);
 	map.addLayer({
-		id: "marker-layer",
-		type: "symbol",
-		source: "markers",
+		id: 'marker-layer',
+		type: 'symbol',
+		source: 'markers',
 		layout: {
-			"icon-image": "birdIcon",
-			"icon-size": 0.04
-		},
+			'icon-image': 'birdIcon',
+			'icon-size': 0.04
+		}
 	});
 }
