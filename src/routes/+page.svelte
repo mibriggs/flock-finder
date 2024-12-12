@@ -94,5 +94,5 @@
 
 <!-- <Toggle
 	class="h-10 w-20 after:size-[38px] peer-checked:bg-purple-500 after:peer-checked:translate-x-10"
-	No use case besides just wanted documentation on how this could be done in tw
 /> -->
+<!-- No use case besides just wanted documentation on how this could be done in tw -->
