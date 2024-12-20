@@ -47,12 +47,15 @@
 			return;
 		}
 
-		await readFile(userFile)
-			.then((csvData) => (birds = readCsvFile(csvData)))
-			.catch((error) => {
-				console.error(error);
-				launchErrorToast(error);
-			});
+		await readFile(userFile).then((csvData) => {
+			const { object: birdData, error } = readCsvFile(csvData);
+			if (error) {
+				birds = [];
+				launchErrorToast(error.message);
+			} else {
+				birds = birdData;
+			}
+		});
 	};
 
 	const launchErrorToast = async (errorMessage: string) => {
@@ -76,11 +79,9 @@
 </script>
 
 <main class="flex h-screen w-screen flex-col items-center gap-3 p-8">
-	{#if fileLoadTracker.loadComplete}
+	{#if fileLoadTracker.loadComplete && birds.length > 0}
 		<MapPanel {birds} />
-	{/if}
-
-	{#if fileLoadTracker.isLoading}
+	{:else if fileLoadTracker.isLoading}
 		<div>Loading...</div>
 	{/if}
 
