@@ -47,11 +47,11 @@
 			return;
 		}
 
-		await readFile(userFile).then((csvData) => {
+		await readFile(userFile).then(async (csvData) => {
 			const { object: birdData, error } = readCsvFile(csvData);
 			if (error) {
 				birds = [];
-				launchErrorToast(error.message);
+				await launchErrorToast(error.message);
 			} else {
 				birds = birdData;
 			}
@@ -86,7 +86,7 @@
 	{/if}
 
 	<FileDropZone
-		class="mt-8"
+		class="absolute bottom-[4%]"
 		allowedExtensions={allowedFiles}
 		onFileSelection={handleFileSelection}
 		bind:dropZoneContainer={filedDropZone}
@@ -94,6 +94,6 @@
 </main>
 
 <!-- <Toggle
-	class="h-10 w-20 after:size-[38px] peer-checked:bg-purple-500 after:peer-checked:translate-x-10"
+	class="h-10 w-20 after:size-[32px] after:left-1 after:top-1 peer-checked:bg-purple-500 after:peer-checked:translate-x-10 mb-24"
 /> -->
 <!-- No use case besides just wanted documentation on how this could be done in tw -->
