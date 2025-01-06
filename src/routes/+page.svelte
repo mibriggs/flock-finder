@@ -6,8 +6,25 @@
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
 	import { toast } from 'svoast';
 
+	type BirdNames = {
+		commonName: string;
+		scientificName: string;
+	};
+
 	let filedDropZone: HTMLElement | undefined = $state();
 	let birds: EBirdEntry[] = $state([]);
+	let uniqueBirds = $derived.by(() => {
+		const notSeen: BirdNames[] = [];
+		birds.forEach(bird => {
+			if (notSeen.findIndex(notSeenBird => notSeenBird.commonName === bird.commonName.trim().toWellFormed()) === -1) {
+				notSeen.push({
+					commonName: bird.commonName.trim().toWellFormed(),
+					scientificName: bird.scientificName
+				});
+			}
+		});
+		return new Set(notSeen);
+	});
 
 	const doNothingOnDrag = (e: DragEvent) => {
 		e.stopPropagation();
@@ -81,6 +98,12 @@
 <main class="flex h-screen w-screen flex-col items-center gap-3 p-8">
 	{#if fileLoadTracker.loadComplete && birds.length > 0}
 		<MapPanel {birds} />
+		<select id="filter">
+			{#each uniqueBirds as bird }
+				<option value={bird.scientificName}>{bird.commonName}</option>
+			{/each}
+			<option value="all">All</option>
+		  </select>
 	{:else if fileLoadTracker.isLoading}
 		<div>Loading...</div>
 	{/if}
