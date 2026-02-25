@@ -10,6 +10,7 @@
 
 	let filedDropZone: HTMLElement | undefined = $state();
 	let birds: EBirdEntry[] = $state([]);
+	let currentSpecies: string[] = $state(['all']);
 	let uniqueBirds: Set<EBirdEntry> = $derived.by(() => {
 		const notSeen: EBirdEntry[] = [];
 		birds.forEach((bird) => {
@@ -22,6 +23,15 @@
 			}
 		});
 		return new Set(notSeen);
+	});
+	let filteredBirds: EBirdEntry[] = $derived.by(() => {
+		let newBirds: EBirdEntry[] = [];
+		if (currentSpecies.indexOf('all') === -1) {
+			newBirds = birds.filter((bird) => currentSpecies.indexOf(bird.scientificName) !== -1);
+		} else {
+			newBirds = birds;
+		}
+		return newBirds;
 	});
 
 	const doNothingOnDrag = (e: DragEvent) => {
@@ -78,6 +88,7 @@
 			duration: 3000,
 			closable: true
 		});
+		fileLoadTracker.reset();
 	};
 
 	$effect(() => {
@@ -93,6 +104,7 @@
 	const handleReset = () => {
 		birds = [];
 		fileLoadTracker.reset();
+		currentSpecies = ['all'];
 	};
 
 	const allowedFiles: string[] = ['.csv'];
@@ -101,7 +113,7 @@
 <main class="relative flex h-screen w-screen gap-3 p-8">
 	{#if fileLoadTracker.loadComplete && birds.length > 0}
 		<div class="flex w-72 flex-col justify-between gap-2">
-			<FilterPanel birds={uniqueBirds} />
+			<FilterPanel birds={uniqueBirds} bind:species={currentSpecies} />
 			<button
 				onclick={handleReset}
 				class="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 active:bg-slate-100"
@@ -111,7 +123,7 @@
 			</button>
 		</div>
 		<div class="flex flex-1">
-			<MapPanel {birds} />
+			<MapPanel birds={filteredBirds} />
 		</div>
 	{:else if fileLoadTracker.isLoading}
 		<FilterPanel disabled />
@@ -132,7 +144,7 @@
 		</div>
 	{/if}
 
-	<div class={fileLoadTracker.loadComplete ? 'hide' : ''}>
+	<div class={fileLoadTracker.loadComplete || fileLoadTracker.isSelected ? 'hide' : ''}>
 		<FileDropZone
 			class="absolute bottom-[4%] left-1/2 -translate-x-1/2"
 			allowedExtensions={allowedFiles}

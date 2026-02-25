@@ -223,7 +223,7 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 		layout: {
 			'text-field': '{point_count_abbreviated}',
 			'text-size': 12,
-			'text-font': ['Noto Sans Regular']
+			'text-font': ['Noto Sans Bold']
 		},
 		paint: { 'text-color': '#ffffff' }
 	});

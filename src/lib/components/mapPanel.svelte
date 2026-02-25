@@ -19,6 +19,24 @@
 	let map: Map;
 
 	$effect(() => {
+		const features = birds.map((bird) => ({
+			type: 'Feature' as const,
+			geometry: { type: 'Point' as const, coordinates: [bird.longitude, bird.latitude] },
+			properties: {
+				title: bird.commonName,
+				date: bird.date,
+				scientificName: bird.scientificName,
+				count: bird.count,
+				location: bird.location
+			}
+		}));
+		const source = map?.getSource('markers') as GeoJSONSource | undefined;
+
+		if (!source) return;
+		source.setData({ type: 'FeatureCollection', features });
+	});
+
+	$effect(() => {
 		map = new Map({
 			container: mapContainer,
 			style: 'https://tiles.openfreemap.org/styles/positron',
