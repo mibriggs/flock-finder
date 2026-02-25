@@ -1,26 +1,24 @@
 <script lang="ts">
 	import { readCsvFile, readFile } from '$lib';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
+	import FilterPanel from '$lib/components/filterPanel.svelte';
 	import MapPanel from '$lib/components/mapPanel.svelte';
 	import { type EBirdEntry } from '$lib/eBirdEntry';
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
 	import { toast } from 'svoast';
-
-	type BirdNames = {
-		commonName: string;
-		scientificName: string;
-	};
+	import { RotateCcw } from 'lucide-svelte';
 
 	let filedDropZone: HTMLElement | undefined = $state();
 	let birds: EBirdEntry[] = $state([]);
-	let uniqueBirds = $derived.by(() => {
-		const notSeen: BirdNames[] = [];
-		birds.forEach(bird => {
-			if (notSeen.findIndex(notSeenBird => notSeenBird.commonName === bird.commonName.trim().toWellFormed()) === -1) {
-				notSeen.push({
-					commonName: bird.commonName.trim().toWellFormed(),
-					scientificName: bird.scientificName
-				});
+	let uniqueBirds: Set<EBirdEntry> = $derived.by(() => {
+		const notSeen: EBirdEntry[] = [];
+		birds.forEach((bird) => {
+			if (
+				notSeen.findIndex(
+					(notSeenBird) => notSeenBird.commonName === bird.commonName.trim().toWellFormed()
+				) === -1
+			) {
+				notSeen.push(bird);
 			}
 		});
 		return new Set(notSeen);
@@ -92,31 +90,65 @@
 		return () => fileLoadTracker.reset();
 	});
 
+	const handleReset = () => {
+		birds = [];
+		fileLoadTracker.reset();
+	};
+
 	const allowedFiles: string[] = ['.csv'];
 </script>
 
-<main class="flex h-screen w-screen flex-col items-center gap-3 p-8">
+<main class="relative flex h-screen w-screen gap-3 p-8">
 	{#if fileLoadTracker.loadComplete && birds.length > 0}
-		<MapPanel {birds} />
-		<select id="filter">
-			{#each uniqueBirds as bird }
-				<option value={bird.scientificName}>{bird.commonName}</option>
-			{/each}
-			<option value="all">All</option>
-		  </select>
+		<div class="flex w-72 flex-col justify-between gap-2">
+			<FilterPanel birds={uniqueBirds} />
+			<button
+				onclick={handleReset}
+				class="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 active:bg-slate-100"
+			>
+				<RotateCcw size={16} />
+				Load new file
+			</button>
+		</div>
+		<div class="flex flex-1">
+			<MapPanel {birds} />
+		</div>
 	{:else if fileLoadTracker.isLoading}
-		<div>Loading...</div>
+		<FilterPanel disabled />
+		<div
+			class="flex h-full flex-1 animate-pulse items-center justify-center rounded-lg bg-slate-200"
+		>
+			<svg
+				class="h-10 w-10 animate-spin text-slate-400"
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+			>
+				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+				></circle>
+				<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+				></path>
+			</svg>
+		</div>
 	{/if}
 
-	<FileDropZone
-		class="absolute bottom-[4%]"
-		allowedExtensions={allowedFiles}
-		onFileSelection={handleFileSelection}
-		bind:dropZoneContainer={filedDropZone}
-	/>
+	<div class={fileLoadTracker.loadComplete ? 'hide' : ''}>
+		<FileDropZone
+			class="absolute bottom-[4%] left-1/2 -translate-x-1/2"
+			allowedExtensions={allowedFiles}
+			onFileSelection={handleFileSelection}
+			bind:dropZoneContainer={filedDropZone}
+		/>
+	</div>
 </main>
 
 <!-- <Toggle
 	class="h-10 w-20 after:size-[32px] after:left-1 after:top-1 peer-checked:bg-purple-500 after:peer-checked:translate-x-10 mb-24"
 /> -->
 <!-- No use case besides just wanted documentation on how this could be done in tw -->
+
+<style>
+	.hide {
+		display: none;
+	}
+</style>

@@ -8,6 +8,15 @@ import birdImage from '$lib/assets/birdNoBg.png';
 
 type DropZoneEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
 
+const formatDate = (date: Date) => {
+	return new Intl.DateTimeFormat('en-US', {
+		weekday: 'long',
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric'
+	}).format(date);
+};
+
 export interface FileDropZoneProps {
 	allowedExtensions: string[];
 	class?: string;
@@ -18,6 +27,14 @@ export interface FileDropZoneProps {
 export interface ObjectOrError<T> {
 	error?: Error;
 	object: T;
+}
+
+export interface BirdFeatureProperties {
+	title: string;
+	scientificName: string;
+	date: string;
+	location: string;
+	count?: number;
 }
 
 export function readFile(file: File): Promise<string> {
@@ -34,7 +51,7 @@ export function readFile(file: File): Promise<string> {
 		};
 
 		fileReader.onloadstart = () => fileLoadTracker.startLoading();
-		fileReader.onloadend = () => (fileLoadTracker.isProcessing = false);
+		fileReader.onloadend = () => fileLoadTracker.endLoading();
 
 		fileReader.onerror = () =>
 			reject(new Error(`Error reading file: ${fileReader.error?.message}`));
@@ -116,6 +133,7 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 		const typedOutput: EBirdEntry[] = papaparseResult.map((row) => parse(birdSchema, row));
 		return { object: typedOutput };
 	} catch (error: unknown) {
+		console.error(error);
 		return { object: [], error: new Error('An error occurred when parsing the csv.') };
 	}
 }
@@ -126,11 +144,17 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 			type: 'Feature',
 			geometry: {
 				type: 'Point',
-				coordinates: [bird.longitude, bird.latitude]
+				coordinates: [
+					bird.longitude + (Math.random() - 0.5) * 0.0001,
+					bird.latitude + (Math.random() - 0.5) * 0.0001
+				]
 			},
 			properties: {
 				title: bird.commonName,
-				date: bird.date.toDateString()
+				date: formatDate(bird.date),
+				scientificName: bird.scientificName,
+				count: bird.count,
+				location: bird.location
 			}
 		};
 	});
@@ -142,7 +166,66 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 
 	map.addSource('markers', {
 		type: 'geojson',
-		data: geoJson
+		data: geoJson,
+		cluster: true,
+		clusterMaxZoom: 8,
+		clusterRadius: 20
+	});
+
+	map.addLayer({
+		id: 'cluster-halo',
+		type: 'circle',
+		source: 'markers',
+		filter: ['has', 'point_count'],
+		paint: {
+			'circle-color': [
+				'step',
+				['get', 'point_count'],
+				'#2563eb',
+				50,
+				'#eab308',
+				200,
+				'#ea580c',
+				1000,
+				'#b91c1c'
+			],
+			'circle-radius': ['step', ['get', 'point_count'], 30, 50, 40, 200, 52, 1000, 68],
+			'circle-opacity': 0.2
+		}
+	});
+
+	map.addLayer({
+		id: 'clusters',
+		type: 'circle',
+		source: 'markers',
+		filter: ['has', 'point_count'],
+		paint: {
+			'circle-color': [
+				'step',
+				['get', 'point_count'],
+				'#2563eb',
+				50,
+				'#eab308',
+				200,
+				'#ea580c',
+				1000,
+				'#b91c1c'
+			],
+			'circle-radius': ['step', ['get', 'point_count'], 16, 50, 22, 200, 30, 1000, 40]
+		}
+	});
+
+	map.addLayer({
+		id: 'cluster-count',
+		type: 'symbol',
+		source: 'markers',
+		filter: ['has', 'point_count'],
+		layout: {
+			'text-field': '{point_count_abbreviated}',
+			'text-size': 12,
+			'text-font': ['Noto Sans Regular']
+		},
+		paint: { 'text-color': '#ffffff' }
 	});
 
 	const loadedBirdImage = await map.loadImage(birdImage);
@@ -151,9 +234,11 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 		id: 'marker-layer',
 		type: 'symbol',
 		source: 'markers',
+		filter: ['!', ['has', 'point_count']],
 		layout: {
 			'icon-image': 'birdIcon',
-			'icon-size': 0.04
+			'icon-size': 0.055,
+			'icon-allow-overlap': true
 		}
 	});
 }

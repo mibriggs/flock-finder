@@ -1,10 +1,18 @@
 <script lang="ts">
 	import type { EBirdEntry } from '$lib/eBirdEntry';
-	import { Map, NavigationControl, Popup } from 'maplibre-gl';
+	import {
+		FullscreenControl,
+		GeoJSONSource,
+		Map,
+		NavigationControl,
+		Popup,
+		type MapLayerMouseEvent
+	} from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
-	import { addMarkersToMap } from '$lib';
-	import type { Feature, Point } from 'geojson';
-	import { PUBLIC_MAP_TILER_KEY } from '$env/static/public';
+	import { addMarkersToMap, type BirdFeatureProperties } from '$lib';
+	import type { Feature, Point, Position } from 'geojson';
+	import { mount, unmount } from 'svelte';
+	import MapPopup from './mapPopup.svelte';
 
 	let { birds }: { birds: EBirdEntry[] } = $props();
 	let mapContainer: HTMLDivElement;
@@ -13,29 +21,67 @@
 	$effect(() => {
 		map = new Map({
 			container: mapContainer,
-			style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${PUBLIC_MAP_TILER_KEY}`,
+			style: 'https://tiles.openfreemap.org/styles/positron',
 			center: [-95, 40],
 			zoom: 4
 		});
 
 		map.addControl(new NavigationControl());
-		map.on('load', () => addMarkersToMap(birds, map));
-		map.on('click', 'marker-layer', (event) => {
+		map.addControl(new FullscreenControl());
+		map.on('load', async () => await addMarkersToMap(birds, map));
+		map.on('click', 'marker-layer', (event: MapLayerMouseEvent) => {
 			let birdsInArea = event.features ? [...event.features] : [];
 			if (birdsInArea.length > 0) {
-				const selectedBird: Feature<Point> = birdsInArea[0] as Feature<Point>;
-				const coordinates = selectedBird.geometry.coordinates;
-				new Popup()
-					.setLngLat([coordinates[0], coordinates[1]])
-					.setHTML(
-						`<h3>${selectedBird.properties?.title}</h3><p>${selectedBird.properties?.date}</p>`
-					)
-					.addTo(map);
+				drawPopupPanel(birdsInArea[0] as unknown as Feature<Point, BirdFeatureProperties>);
+			}
+		});
+		map.on('click', 'clusters', async (event: MapLayerMouseEvent) => {
+			const features = event.features;
+			if (!features || features.length === 0) return;
+
+			const clusterId = features[0].properties.cluster_id;
+			const source = map.getSource('markers') as GeoJSONSource;
+
+			const zoomNumber = await source.getClusterExpansionZoom(clusterId);
+			map.easeTo({
+				center: (features[0].geometry as Point).coordinates as [number, number],
+				zoom: zoomNumber
+			});
+		});
+
+		return () => map.remove();
+	});
+
+	const drawPopupPanel = (bird: Feature<Point, BirdFeatureProperties>) => {
+		const coords: Position = bird.geometry.coordinates;
+		const container: HTMLDivElement = document.createElement('div');
+		const popup = new Popup({ closeButton: false });
+
+		const instance = mount(MapPopup, {
+			target: container,
+			props: {
+				commonName: bird.properties.title,
+				scientificName: bird.properties.scientificName,
+				date: bird.properties.date,
+				location: bird.properties.location,
+				count: bird.properties.count,
+				onClose: () => popup.remove()
 			}
 		});
 
-		return () => map.remove;
-	});
+		popup.setLngLat([coords[0], coords[1]]).setDOMContent(container).addTo(map);
+
+		popup.on('close', () => unmount(instance));
+	};
 </script>
 
-<div id="map" class="h-3/4 w-full text-xs italic" bind:this={mapContainer}></div>
+<div id="map" class="h-full w-full text-xs italic" bind:this={mapContainer}></div>
+
+<style>
+	:global(.maplibregl-popup-content) {
+		border-radius: 0.5rem !important;
+		padding: 0 !important;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+		overflow: visible !important;
+	}
+</style>
