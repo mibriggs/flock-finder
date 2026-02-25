@@ -110,7 +110,7 @@
 	const allowedFiles: string[] = ['.csv'];
 </script>
 
-<main class="relative flex h-screen w-screen gap-3 p-8">
+<main class="relative flex h-dvh w-screen gap-3 p-8">
 	{#if fileLoadTracker.loadComplete && birds.length > 0}
 		<div class="flex w-72 flex-col justify-between gap-2">
 			<FilterPanel birds={uniqueBirds} bind:species={currentSpecies} />
