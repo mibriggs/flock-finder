@@ -62,7 +62,7 @@ export function readFile(file: File): Promise<string> {
 
 export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 	let actualUnsolvedErrors = 0;
-	const parsed = Papa.parse<Record<string, any>>(csvData, {
+	const parsed = Papa.parse<Record<string, unknown>>(csvData, {
 		header: true,
 		dynamicTyping: true,
 		skipEmptyLines: true,
