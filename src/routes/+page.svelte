@@ -6,7 +6,9 @@
 	import { type EBirdEntry } from '$lib/eBirdEntry';
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
 	import { toast } from 'svoast';
-	import { RotateCcw } from 'lucide-svelte';
+	import { RotateCcw, SlidersHorizontal, X } from 'lucide-svelte';
+
+	let drawerOpen = $state(false);
 
 	let filedDropZone: HTMLElement | undefined = $state();
 	let birds: EBirdEntry[] = $state([]);
@@ -105,6 +107,7 @@
 		birds = [];
 		fileLoadTracker.reset();
 		currentSpecies = ['all'];
+		drawerOpen = false;
 	};
 
 	const allowedFiles: string[] = ['.csv'];
@@ -112,21 +115,57 @@
 
 <main class="relative flex h-dvh w-screen gap-3 p-8">
 	{#if fileLoadTracker.loadComplete && birds.length > 0}
-		<div class="flex w-72 flex-col justify-between gap-2">
-			<FilterPanel birds={uniqueBirds} bind:species={currentSpecies} />
+		<!-- Mobile drawer toggle -->
+		<button
+			onclick={() => (drawerOpen = true)}
+			class="fixed left-4 top-4 z-20 rounded-lg border border-slate-300 bg-white p-2 shadow-sm lg:hidden"
+		>
+			<SlidersHorizontal size={20} class="text-slate-600" />
+		</button>
+
+		<!-- Overlay -->
+		{#if drawerOpen}
+			<div
+				class="fixed inset-0 z-20 bg-black/30 lg:hidden"
+				onclick={() => (drawerOpen = false)}
+			></div>
+		{/if}
+
+		<!-- Sidebar / Drawer -->
+		<div
+			class={[
+				'fixed left-0 top-0 z-30 flex h-full w-4/5 max-w-xs flex-col justify-between gap-2 rounded-r-xl bg-white p-4 shadow-2xl transition-transform duration-300 lg:static lg:w-72 lg:translate-x-0 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none',
+				drawerOpen ? 'translate-x-0 shadow-xl' : '-translate-x-full'
+			]}
+		>
+			<!-- Close button (mobile only) -->
+			<div>
+				<div class="mb-3 flex justify-end lg:hidden">
+					<button
+						onclick={() => (drawerOpen = false)}
+						class="flex items-center gap-1 rounded-lg bg-red-500 px-3 py-1 text-sm font-medium text-white shadow-md transition-all active:scale-90 active:shadow-sm"
+					>
+						<X size={14} /> Close
+					</button>
+				</div>
+				<FilterPanel birds={uniqueBirds} bind:species={currentSpecies} />
+			</div>
 			<button
 				onclick={handleReset}
-				class="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 active:bg-slate-100"
+				class="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-sm transition-all hover:bg-slate-50 active:scale-90 active:bg-slate-100 active:shadow-none"
 			>
 				<RotateCcw size={16} />
 				Load new file
 			</button>
 		</div>
+
 		<div class="flex flex-1">
 			<MapPanel birds={filteredBirds} />
 		</div>
 	{:else if fileLoadTracker.isLoading}
-		<FilterPanel disabled />
+		<div class="hidden w-72 lg:block">
+			<FilterPanel disabled />
+		</div>
 		<div
 			class="flex h-full flex-1 animate-pulse items-center justify-center rounded-lg bg-slate-200"
 		>
