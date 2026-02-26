@@ -2,6 +2,7 @@
 	import type { EBirdEntry } from '$lib/eBirdEntry';
 	import { ChevronDown, X } from 'lucide-svelte';
 	import { fade } from 'svelte/transition';
+	import DateRangePicker from './dateRangePicker.svelte';
 
 	interface Props {
 		disabled?: boolean;
@@ -56,7 +57,7 @@
 			<ChevronDown class="h-4 w-4 transition-transform duration-500 group-open:rotate-180" />
 		</summary>
 		<div class="px-4 pb-3">
-			<p>This content is hidden by default. It can be text, images, or any other HTML elements.</p>
+			<DateRangePicker />
 		</div>
 	</details>
 
