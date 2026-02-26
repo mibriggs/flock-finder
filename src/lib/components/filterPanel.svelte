@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { EBirdEntry } from '$lib/eBirdEntry';
-	import { ChevronDown } from 'lucide-svelte';
+	import { ChevronDown, X } from 'lucide-svelte';
+	import { fade } from 'svelte/transition';
 
 	interface Props {
 		disabled?: boolean;
@@ -17,8 +18,9 @@
 	let filteredBirds: EBirdEntry[] = $derived.by(() => {
 		if (searchInput.trim() !== '') {
 			const arrayFromSet = [...birds];
-			return arrayFromSet.filter(
-				(bird) => bird.commonName.includes(searchInput) || bird.scientificName.includes(searchInput)
+			const normalizedInput = searchInput.trim().replace(/\s+/g, ' ');
+		return arrayFromSet.filter(
+				(bird) => bird.commonName.includes(normalizedInput) || bird.scientificName.includes(normalizedInput)
 			);
 		}
 		return [...birds];
@@ -27,17 +29,19 @@
 	const deselectOtherInputs = (e: InputElementChangeEvent) => {
 		if (e.currentTarget.checked) {
 			species = ['all'];
+		} else {
+			species = [];
 		}
 	};
 
-	const deselectAllInput = (e: InputElementChangeEvent) => {
+	const deselectAllInput = (e: InputElementChangeEvent, scientificName: string) => {
 		if (e.currentTarget.checked && species.includes('all')) {
-			species = species.filter((bird) => bird !== 'all');
+			species = [scientificName];
+		} else if (e.currentTarget.checked) {
+			species.push(scientificName);
+		} else {
+			species = species.filter((bird) => bird !== scientificName);
 		}
-	};
-
-	const filteredListContainsValue = (scientificName: string): boolean => {
-		return filteredBirds.some((fb) => fb.scientificName === scientificName);
 	};
 </script>
 
@@ -61,13 +65,23 @@
 			Species
 			<ChevronDown class="h-4 w-4 transition-transform duration-500 group-open:rotate-180" />
 		</summary>
-		<div class="px-4 pb-2 pt-2">
+		<div class="relative px-4 pb-2 pt-2">
 			<input
-				class="w-full rounded-md border border-slate-200 px-3 py-1.5 text-sm outline-none focus:border-slate-400"
+				class="w-full rounded-md border border-slate-200 px-3 py-1.5 pr-7 text-sm outline-none focus:border-slate-400"
 				type="text"
 				placeholder="Search species..."
 				bind:value={searchInput}
 			/>
+			{#if searchInput.trim() !== ''}
+				<button
+					transition:fade
+					class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+					onclick={() => (searchInput = '')}
+					aria-label="Clear search"
+				>
+					<X size={14} />
+				</button>
+			{/if}
 		</div>
 		<div
 			class="flex max-h-[calc(100vh-25rem)] flex-col divide-y divide-slate-100 overflow-y-auto px-4 pb-3"
@@ -78,14 +92,13 @@
 					id="all"
 					name="all"
 					value="all"
-					bind:group={species}
+					checked={species.includes('all')}
 					onchange={(e) => deselectOtherInputs(e)}
 				/>
 				All
 			</label>
-			{#each birds as bird (bird.scientificName)}
+			{#each filteredBirds as bird (bird.scientificName)}
 				<label
-					class:hide={!filteredListContainsValue(bird.scientificName)}
 					class="flex items-center gap-2 py-1.5 text-sm text-slate-700"
 					for={bird.scientificName}
 				>
@@ -94,8 +107,8 @@
 						id={bird.scientificName}
 						name={bird.scientificName}
 						value={bird.scientificName}
-						bind:group={species}
-						onchange={deselectAllInput}
+						checked={species.includes(bird.scientificName)}
+						onchange={(e) => deselectAllInput(e, bird.scientificName)}
 					/>
 					<span class="flex flex-col">
 						<span>{bird.commonName}</span>
@@ -110,10 +123,6 @@
 <style>
 	details[open] > div {
 		animation: fadeIn 0.5s ease-out;
-	}
-
-	.hide {
-		display: none;
 	}
 
 	@keyframes fadeIn {
