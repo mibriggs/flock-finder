@@ -145,8 +145,8 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 			geometry: {
 				type: 'Point',
 				coordinates: [
-					bird.longitude + (Math.random() - 0.5) * 0.0001,
-					bird.latitude + (Math.random() - 0.5) * 0.0001
+					bird.longitude + (Math.random() - 0.5) * 0.0005,
+					bird.latitude + (Math.random() - 0.5) * 0.0005
 				]
 			},
 			properties: {
