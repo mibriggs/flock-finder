@@ -18,9 +18,11 @@
 	let filteredBirds: EBirdEntry[] = $derived.by(() => {
 		if (searchInput.trim() !== '') {
 			const arrayFromSet = [...birds];
-			const normalizedInput = searchInput.trim().replace(/\s+/g, ' ');
-		return arrayFromSet.filter(
-				(bird) => bird.commonName.includes(normalizedInput) || bird.scientificName.includes(normalizedInput)
+			const normalizedInput = searchInput.trim().replace(/\s+/g, ' ').toLowerCase();
+			return arrayFromSet.filter(
+				(bird) =>
+					bird.commonName.toLowerCase().includes(normalizedInput) ||
+					bird.scientificName.toLowerCase().includes(normalizedInput)
 			);
 		}
 		return [...birds];
@@ -83,9 +85,7 @@
 				</button>
 			{/if}
 		</div>
-		<div
-			class="flex max-h-[calc(100vh-25rem)] flex-col divide-y divide-slate-100 overflow-y-auto px-4 pb-3"
-		>
+		<div class="border-b border-slate-100 px-4">
 			<label class="flex items-center gap-2 py-1.5 text-sm text-slate-700" for="all">
 				<input
 					type="checkbox"
@@ -95,8 +95,12 @@
 					checked={species.includes('all')}
 					onchange={(e) => deselectOtherInputs(e)}
 				/>
-				All
+				All ({birds.size})
 			</label>
+		</div>
+		<div
+			class="flex max-h-[calc(100vh-25rem)] flex-col divide-y divide-slate-100 overflow-y-auto px-4 pb-3"
+		>
 			{#each filteredBirds as bird (bird.scientificName)}
 				<label
 					class="flex items-center gap-2 py-1.5 text-sm text-slate-700"
