@@ -128,6 +128,7 @@
 			<div
 				class="fixed inset-0 z-20 bg-black/30 lg:hidden"
 				onclick={() => (drawerOpen = false)}
+				aria-hidden="true"
 			></div>
 		{/if}
 
@@ -185,7 +186,7 @@
 
 	<div class={fileLoadTracker.loadComplete || fileLoadTracker.isSelected ? 'hide' : ''}>
 		<FileDropZone
-			class="absolute bottom-[4%] left-1/2 -translate-x-1/2"
+			class="absolute bottom-[4%] left-1/2 w-[90vw] max-w-sm -translate-x-1/2"
 			allowedExtensions={allowedFiles}
 			onFileSelection={handleFileSelection}
 			bind:dropZoneContainer={filedDropZone}

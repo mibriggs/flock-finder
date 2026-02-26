@@ -13,6 +13,16 @@
 	};
 
 	let { disabled = false, species = $bindable([]), birds = new Set() }: Props = $props();
+	let searchInput: string = $state('');
+	let filteredBirds: EBirdEntry[] = $derived.by(() => {
+		if (searchInput.trim() !== '') {
+			const arrayFromSet = [...birds];
+			return arrayFromSet.filter(
+				(bird) => bird.commonName.includes(searchInput) || bird.scientificName.includes(searchInput)
+			);
+		}
+		return [...birds];
+	});
 
 	const deselectOtherInputs = (e: InputElementChangeEvent) => {
 		if (e.currentTarget.checked) {
@@ -24,6 +34,10 @@
 		if (e.currentTarget.checked && species.includes('all')) {
 			species = species.filter((bird) => bird !== 'all');
 		}
+	};
+
+	const filteredListContainsValue = (scientificName: string): boolean => {
+		return filteredBirds.some((fb) => fb.scientificName === scientificName);
 	};
 </script>
 
@@ -47,8 +61,18 @@
 			Species
 			<ChevronDown class="h-4 w-4 transition-transform duration-500 group-open:rotate-180" />
 		</summary>
-		<div class="flex max-h-[calc(100vh-25rem)] flex-col gap-1 overflow-y-auto px-4 pb-3">
-			<label class="flex items-center gap-2 text-sm text-slate-700" for="all">
+		<div class="px-4 pb-2 pt-2">
+			<input
+				class="w-full rounded-md border border-slate-200 px-3 py-1.5 text-sm outline-none focus:border-slate-400"
+				type="text"
+				placeholder="Search species..."
+				bind:value={searchInput}
+			/>
+		</div>
+		<div
+			class="flex max-h-[calc(100vh-25rem)] flex-col divide-y divide-slate-100 overflow-y-auto px-4 pb-3"
+		>
+			<label class="flex items-center gap-2 py-1.5 text-sm text-slate-700" for="all">
 				<input
 					type="checkbox"
 					id="all"
@@ -59,8 +83,12 @@
 				/>
 				All
 			</label>
-			{#each birds as bird}
-				<label class="flex items-center gap-2 text-sm text-slate-700" for={bird.scientificName}>
+			{#each birds as bird (bird.scientificName)}
+				<label
+					class:hide={!filteredListContainsValue(bird.scientificName)}
+					class="flex items-center gap-2 py-1.5 text-sm text-slate-700"
+					for={bird.scientificName}
+				>
 					<input
 						type="checkbox"
 						id={bird.scientificName}
@@ -69,7 +97,10 @@
 						bind:group={species}
 						onchange={deselectAllInput}
 					/>
-					{bird.commonName}
+					<span class="flex flex-col">
+						<span>{bird.commonName}</span>
+						<span class="text-xs italic text-slate-400">{bird.scientificName}</span>
+					</span>
 				</label>
 			{/each}
 		</div>
@@ -79,6 +110,10 @@
 <style>
 	details[open] > div {
 		animation: fadeIn 0.5s ease-out;
+	}
+
+	.hide {
+		display: none;
 	}
 
 	@keyframes fadeIn {
