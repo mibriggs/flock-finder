@@ -21,7 +21,13 @@
 	$effect(() => {
 		const features = birds.map((bird) => ({
 			type: 'Feature' as const,
-			geometry: { type: 'Point' as const, coordinates: [bird.longitude + (Math.random() - 0.5) * 0.0005, bird.latitude + (Math.random() - 0.5) * 0.0005] },
+			geometry: {
+				type: 'Point' as const,
+				coordinates: [
+					bird.longitude + (Math.random() - 0.5) * 0.0005,
+					bird.latitude + (Math.random() - 0.5) * 0.0005
+				]
+			},
 			properties: {
 				title: bird.commonName,
 				date: bird.date,

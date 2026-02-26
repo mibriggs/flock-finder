@@ -85,6 +85,19 @@
 		});
 	};
 
+	const loadDemo = async () => {
+		fileLoadTracker.startLoading();
+		const response = await fetch('/demo.csv');
+		const csvData = await response.text();
+		const { object: birdData, error } = readCsvFile(csvData);
+		if (error) {
+			await launchErrorToast(error.message);
+		} else {
+			birds = birdData;
+			fileLoadTracker.endLoading();
+		}
+	};
+
 	const launchErrorToast = async (errorMessage: string) => {
 		toast.error(errorMessage, {
 			duration: 3000,
@@ -191,6 +204,9 @@
 			onFileSelection={handleFileSelection}
 			bind:dropZoneContainer={filedDropZone}
 		/>
+		<p class="absolute bottom-[1%] left-1/2 -translate-x-1/2 whitespace-nowrap text-sm text-slate-400">
+			or <button class="underline hover:text-slate-600" onclick={loadDemo}>try a demo</button>
+		</p>
 	</div>
 </main>
 

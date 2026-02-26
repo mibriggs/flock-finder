@@ -95,7 +95,7 @@
 					checked={species.includes('all')}
 					onchange={(e) => deselectOtherInputs(e)}
 				/>
-				All ({birds.size})
+				All Species ({birds.size})
 			</label>
 		</div>
 		<div
