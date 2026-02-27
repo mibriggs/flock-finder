@@ -80,7 +80,13 @@
 						<ChevronLeft class="size-4" />
 					</DateRangePicker.PrevButton>
 					<div class="flex items-center gap-1 text-sm font-semibold text-gray-700">
-						<DateRangePicker.Heading />
+						<DateRangePicker.MonthSelect
+							monthFormat="short"
+							class="w-fit rounded border-none focus:bg-gray-300/30 focus:ring-gray-400/40"
+						/>
+						<DateRangePicker.YearSelect
+							class="w-fit rounded border-none focus:bg-gray-300/30 focus:ring-gray-400/40"
+						/>
 					</div>
 					<DateRangePicker.NextButton
 						class="inline-flex size-7 items-center justify-center rounded-md text-gray-500 hover:bg-gray-100 active:bg-gray-200"

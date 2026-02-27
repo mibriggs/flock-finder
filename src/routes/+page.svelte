@@ -22,7 +22,7 @@
 
 	$effect(() => {
 		const { start, end } = currentDateRange;
-		if (!prevEnd && start && end) {
+		if (end !== prevEnd && start && end) {
 			committedDateRange = { start, end };
 		} else if (!start && !end) {
 			committedDateRange = { start: undefined, end: undefined };
