@@ -141,6 +141,8 @@
 		birds = [];
 		fileLoadTracker.reset();
 		currentSpecies = ['all'];
+		currentDateRange = { start: undefined, end: undefined };
+		committedDateRange = { start: undefined, end: undefined };
 		drawerOpen = false;
 	};
 
@@ -204,7 +206,7 @@
 			<MapPanel birds={filteredBirds} />
 		</div>
 	{:else if fileLoadTracker.isLoading}
-		<div class="hidden w-72 lg:block">
+		<div class="hidden w-96 lg:block">
 			<FilterPanel disabled />
 		</div>
 		<div
