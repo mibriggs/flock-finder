@@ -37,10 +37,13 @@
 						isInDateRange(bird.date, committedDateRange.start!, committedDateRange.end!)
 					)
 				: birds;
+		const seenNames = new Set<string>();
 		const seen = new Map<string, EBirdEntry>();
 		dateFilteredBirds.forEach((bird) => {
-			const name = bird.commonName.trim().toWellFormed();
-			if (!seen.has(name)) seen.set(name, bird);
+			if (!seen.has(bird.scientificName) && !seenNames.has(bird.commonName.trim().toWellFormed())) {
+				seen.set(bird.scientificName, bird);
+				seenNames.add(bird.commonName.trim().toWellFormed());
+			}
 		});
 		return new SvelteSet(seen.values());
 	});

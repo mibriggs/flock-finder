@@ -103,7 +103,10 @@
 			{/if}
 		</div>
 		<div class="border-b border-slate-100 px-4">
-			<label class="flex items-center gap-2 py-1.5 text-sm text-slate-700" for="all">
+			<label
+				class="flex cursor-pointer select-none items-center gap-2 py-1.5 text-sm text-slate-700"
+				for="all"
+			>
 				<input
 					type="checkbox"
 					id="all"
@@ -111,6 +114,7 @@
 					value="all"
 					checked={species.includes('all')}
 					onchange={(e) => deselectOtherInputs(e)}
+					class="form-checkbox size-4 scale-125 cursor-pointer rounded border-gray-300 text-emerald-600 hover:border-emerald-500 focus:ring-emerald-500/30"
 				/>
 				All Species ({birds.size})
 			</label>
@@ -120,7 +124,7 @@
 		>
 			{#each filteredBirds as bird (bird.scientificName)}
 				<label
-					class="flex items-center gap-2 py-1.5 text-sm text-slate-700"
+					class="flex cursor-pointer select-none items-center gap-2 py-1.5 text-sm text-slate-700"
 					for={bird.scientificName}
 				>
 					<input
@@ -130,6 +134,7 @@
 						value={bird.scientificName}
 						checked={species.includes(bird.scientificName)}
 						onchange={(e) => deselectAllInput(e, bird.scientificName)}
+						class="form-checkbox size-4 scale-125 cursor-pointer rounded border-gray-300 text-emerald-600 hover:border-emerald-500 focus:ring-emerald-500/30"
 					/>
 					<span class="flex flex-col">
 						<span>{bird.commonName}</span>
