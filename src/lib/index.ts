@@ -5,10 +5,18 @@ import { birdSchema, type EBirdEntry } from './eBirdEntry';
 import type { Map } from 'maplibre-gl';
 import type { FeatureCollection, Feature, GeoJsonProperties, Point } from 'geojson';
 import birdImage from '$lib/assets/birdNoBg.png';
+import type { DateValue } from '@internationalized/date';
 
 type DropZoneEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
 
-const formatDate = (date: Date) => {
+export function isInDateRange(date: Date, start: DateValue, end: DateValue): boolean {
+	const sightedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+	const startDate = new Date(start.year, start.month - 1, start.day);
+	const endDate = new Date(end.year, end.month - 1, end.day);
+	return sightedDate >= startDate && sightedDate <= endDate;
+}
+
+export const formatDate = (date: Date) => {
 	return new Intl.DateTimeFormat('en-US', {
 		weekday: 'long',
 		month: 'short',

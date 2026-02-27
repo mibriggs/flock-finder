@@ -3,18 +3,26 @@
 	import { ChevronDown, X } from 'lucide-svelte';
 	import { fade } from 'svelte/transition';
 	import DateRangePicker from './dateRangePicker.svelte';
+	import type { DateRange } from 'bits-ui';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	interface Props {
 		disabled?: boolean;
 		species?: string[];
-		birds?: Set<EBirdEntry>;
+		birds?: SvelteSet<EBirdEntry>;
+		dateRange?: DateRange;
 	}
 
 	type InputElementChangeEvent = Event & {
 		currentTarget: EventTarget & HTMLInputElement;
 	};
 
-	let { disabled = false, species = $bindable([]), birds = new Set() }: Props = $props();
+	let {
+		disabled = false,
+		species = $bindable([]),
+		dateRange = $bindable(),
+		birds = new SvelteSet()
+	}: Props = $props();
 	let searchInput: string = $state('');
 	let filteredBirds: EBirdEntry[] = $derived.by(() => {
 		if (searchInput.trim() !== '') {
@@ -41,10 +49,18 @@
 		if (e.currentTarget.checked && species.includes('all')) {
 			species = [scientificName];
 		} else if (e.currentTarget.checked) {
-			species.push(scientificName);
+			const updated = [...species, scientificName];
+			if (updated.length === filteredBirds.length) {
+				species = ['all'];
+			} else {
+				species = updated;
+			}
 		} else {
 			species = species.filter((bird) => bird !== scientificName);
 		}
+
+		//update the checked value for current
+		e.currentTarget.checked = species.includes(scientificName) && !species.includes('all');
 	};
 </script>
 
@@ -57,7 +73,7 @@
 			<ChevronDown class="h-4 w-4 transition-transform duration-500 group-open:rotate-180" />
 		</summary>
 		<div class="px-4 pb-3">
-			<DateRangePicker />
+			<DateRangePicker bind:value={dateRange} />
 		</div>
 	</details>
 

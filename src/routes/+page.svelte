@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { readCsvFile, readFile } from '$lib';
+	import { readCsvFile, readFile, isInDateRange } from '$lib';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
 	import FilterPanel from '$lib/components/filterPanel.svelte';
 	import MapPanel from '$lib/components/mapPanel.svelte';
@@ -7,15 +7,24 @@
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
 	import { toast } from 'svoast';
 	import { RotateCcw, SlidersHorizontal, X } from 'lucide-svelte';
+	import type { DateRange } from 'bits-ui';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	let drawerOpen = $state(false);
 
 	let filedDropZone: HTMLElement | undefined = $state();
 	let birds: EBirdEntry[] = $state([]);
 	let currentSpecies: string[] = $state(['all']);
-	let uniqueBirds: Set<EBirdEntry> = $derived.by(() => {
+	let currentDateRange: DateRange = $state({ start: undefined, end: undefined });
+	let uniqueBirds: SvelteSet<EBirdEntry> = $derived.by(() => {
+		const dateFilteredBirds =
+			currentDateRange.start && currentDateRange.end
+				? birds.filter((bird) =>
+						isInDateRange(bird.date, currentDateRange.start!, currentDateRange.end!)
+					)
+				: birds;
 		const notSeen: EBirdEntry[] = [];
-		birds.forEach((bird) => {
+		dateFilteredBirds.forEach((bird) => {
 			if (
 				notSeen.findIndex(
 					(notSeenBird) => notSeenBird.commonName === bird.commonName.trim().toWellFormed()
@@ -24,14 +33,17 @@
 				notSeen.push(bird);
 			}
 		});
-		return new Set(notSeen);
+		return new SvelteSet(notSeen);
 	});
 	let filteredBirds: EBirdEntry[] = $derived.by(() => {
-		let newBirds: EBirdEntry[] = [];
+		let newBirds = birds;
 		if (currentSpecies.indexOf('all') === -1) {
-			newBirds = birds.filter((bird) => currentSpecies.indexOf(bird.scientificName) !== -1);
-		} else {
-			newBirds = birds;
+			newBirds = newBirds.filter((bird) => currentSpecies.includes(bird.scientificName));
+		}
+		if (currentDateRange.start && currentDateRange.end) {
+			const start = currentDateRange.start;
+			const end = currentDateRange.end;
+			newBirds = newBirds.filter((bird) => isInDateRange(bird.date, start, end));
 		}
 		return newBirds;
 	});
@@ -124,6 +136,8 @@
 	};
 
 	const allowedFiles: string[] = ['.csv'];
+
+	$effect(() => console.log(currentDateRange));
 </script>
 
 <main class="relative flex h-dvh w-screen gap-3 p-8">
@@ -148,12 +162,12 @@
 		<!-- Sidebar / Drawer -->
 		<div
 			class={[
-				'fixed left-0 top-0 z-30 flex h-full w-4/5 max-w-xs flex-col justify-between gap-2 rounded-r-xl bg-white p-4 shadow-2xl transition-transform duration-300 lg:static lg:w-72 lg:translate-x-0 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none',
+				'fixed left-0 top-0 z-30 flex h-full w-4/5 max-w-sm flex-col justify-between gap-2 rounded-r-xl bg-white p-4 shadow-2xl transition-transform duration-300 lg:static lg:w-96 lg:translate-x-0 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none',
 				drawerOpen ? 'translate-x-0 shadow-xl' : '-translate-x-full'
 			]}
 		>
 			<!-- Close button (mobile only) -->
-			<div>
+			<div class="overflow-y-auto lg:flex-1 lg:overflow-visible">
 				<div class="mb-3 flex justify-end lg:hidden">
 					<button
 						onclick={() => (drawerOpen = false)}
@@ -162,7 +176,11 @@
 						<X size={14} /> Close
 					</button>
 				</div>
-				<FilterPanel birds={uniqueBirds} bind:species={currentSpecies} />
+				<FilterPanel
+					birds={uniqueBirds}
+					bind:species={currentSpecies}
+					bind:dateRange={currentDateRange}
+				/>
 			</div>
 			<button
 				onclick={handleReset}
@@ -204,7 +222,9 @@
 			onFileSelection={handleFileSelection}
 			bind:dropZoneContainer={filedDropZone}
 		/>
-		<p class="absolute bottom-[1%] left-1/2 -translate-x-1/2 whitespace-nowrap text-sm text-slate-400">
+		<p
+			class="absolute bottom-[1%] left-1/2 -translate-x-1/2 whitespace-nowrap text-sm text-slate-400"
+		>
 			or <button class="underline hover:text-slate-600" onclick={loadDemo}>try a demo</button>
 		</p>
 	</div>

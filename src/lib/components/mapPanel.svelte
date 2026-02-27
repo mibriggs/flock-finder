@@ -9,7 +9,7 @@
 		type MapLayerMouseEvent
 	} from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
-	import { addMarkersToMap, type BirdFeatureProperties } from '$lib';
+	import { addMarkersToMap, formatDate, type BirdFeatureProperties } from '$lib';
 	import type { Feature, Point, Position } from 'geojson';
 	import { mount, unmount } from 'svelte';
 	import MapPopup from './mapPopup.svelte';
@@ -30,7 +30,7 @@
 			},
 			properties: {
 				title: bird.commonName,
-				date: bird.date,
+				date: formatDate(bird.date),
 				scientificName: bird.scientificName,
 				count: bird.count,
 				location: bird.location
