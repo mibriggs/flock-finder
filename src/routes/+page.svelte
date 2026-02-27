@@ -8,6 +8,7 @@
 	import { toast } from 'svoast';
 	import { RotateCcw, SlidersHorizontal, X } from 'lucide-svelte';
 	import type { DateRange } from 'bits-ui';
+	import type { DateValue } from '@internationalized/date';
 	import { SvelteSet } from 'svelte/reactivity';
 
 	let drawerOpen = $state(false);
@@ -16,11 +17,24 @@
 	let birds: EBirdEntry[] = $state([]);
 	let currentSpecies: string[] = $state(['all']);
 	let currentDateRange: DateRange = $state({ start: undefined, end: undefined });
+	let committedDateRange: DateRange = $state({ start: undefined, end: undefined });
+	let prevEnd: DateValue | undefined = undefined;
+
+	$effect(() => {
+		const { start, end } = currentDateRange;
+		if (!prevEnd && start && end) {
+			committedDateRange = { start, end };
+		} else if (!start && !end) {
+			committedDateRange = { start: undefined, end: undefined };
+		}
+		prevEnd = end;
+	});
+
 	let uniqueBirds: SvelteSet<EBirdEntry> = $derived.by(() => {
 		const dateFilteredBirds =
-			currentDateRange.start && currentDateRange.end
+			committedDateRange.start && committedDateRange.end
 				? birds.filter((bird) =>
-						isInDateRange(bird.date, currentDateRange.start!, currentDateRange.end!)
+						isInDateRange(bird.date, committedDateRange.start!, committedDateRange.end!)
 					)
 				: birds;
 		const seen = new Map<string, EBirdEntry>();
@@ -35,9 +49,9 @@
 		if (currentSpecies.indexOf('all') === -1) {
 			newBirds = newBirds.filter((bird) => currentSpecies.includes(bird.scientificName));
 		}
-		if (currentDateRange.start && currentDateRange.end) {
-			const start = currentDateRange.start;
-			const end = currentDateRange.end;
+		if (committedDateRange.start && committedDateRange.end) {
+			const start = committedDateRange.start;
+			const end = committedDateRange.end;
 			newBirds = newBirds.filter((bird) => isInDateRange(bird.date, start, end));
 		}
 		return newBirds;

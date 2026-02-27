@@ -65,7 +65,7 @@
 </script>
 
 <div class={['flex w-full flex-col gap-2', disabled && 'pointer-events-none opacity-50']}>
-	<details class="group overflow-hidden rounded-lg border border-slate-200">
+	<details open class="group overflow-hidden rounded-lg border border-slate-200">
 		<summary
 			class="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-semibold text-slate-700 hover:bg-slate-50"
 		>
@@ -77,7 +77,7 @@
 		</div>
 	</details>
 
-	<details class="group overflow-hidden rounded-lg border border-slate-200">
+	<details open class="group overflow-hidden rounded-lg border border-slate-200">
 		<summary
 			class="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-semibold text-slate-700 hover:bg-slate-50"
 		>
