@@ -4,20 +4,16 @@ export class LoadStateTracker {
 	#isLoading: boolean = $derived<boolean>(this.isSelected && this.#isProcessing);
 	#loadComplete: boolean = $derived<boolean>(this.isSelected && !this.#isProcessing);
 
-	constructor() {
-		$effect.root(() => {
-			$effect(() => console.log(this.#loadComplete))
-		})
-	}
+	constructor() {}
 
 	get isLoading() {
 		return this.#isLoading;
 	}
-	
+
 	get loadComplete() {
 		return this.#loadComplete;
 	}
-	
+
 	startLoading() {
 		this.isSelected = true;
 		this.#isProcessing = true;

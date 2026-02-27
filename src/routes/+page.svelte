@@ -23,17 +23,12 @@
 						isInDateRange(bird.date, currentDateRange.start!, currentDateRange.end!)
 					)
 				: birds;
-		const notSeen: EBirdEntry[] = [];
+		const seen = new Map<string, EBirdEntry>();
 		dateFilteredBirds.forEach((bird) => {
-			if (
-				notSeen.findIndex(
-					(notSeenBird) => notSeenBird.commonName === bird.commonName.trim().toWellFormed()
-				) === -1
-			) {
-				notSeen.push(bird);
-			}
+			const name = bird.commonName.trim().toWellFormed();
+			if (!seen.has(name)) seen.set(name, bird);
 		});
-		return new SvelteSet(notSeen);
+		return new SvelteSet(seen.values());
 	});
 	let filteredBirds: EBirdEntry[] = $derived.by(() => {
 		let newBirds = birds;
@@ -137,7 +132,7 @@
 
 	const allowedFiles: string[] = ['.csv'];
 
-	$effect(() => console.log(currentDateRange));
+	$inspect(currentDateRange);
 </script>
 
 <main class="relative flex h-dvh w-screen gap-3 p-8">
