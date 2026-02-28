@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { X } from 'lucide-svelte';
+	import { ExternalLink, X } from 'lucide-svelte';
 
 	interface Props {
 		commonName: string;
@@ -7,10 +7,19 @@
 		date: string;
 		location: string;
 		count?: number;
+		speciesCode?: string;
 		onClose: () => void;
 	}
 
-	let { commonName, scientificName, date, location, count = undefined, onClose }: Props = $props();
+	let {
+		commonName,
+		scientificName,
+		date,
+		location,
+		count = undefined,
+		speciesCode = undefined,
+		onClose
+	}: Props = $props();
 </script>
 
 <div class="relative flex min-w-[200px] flex-col gap-1 rounded-xl p-2">
@@ -30,4 +39,14 @@
 			<p><span class="font-semibold">Count:</span> {count}</p>
 		{/if}
 	</div>
+	{#if speciesCode}
+		<a
+			href="https://ebird.org/species/{speciesCode}"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-1 flex items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-200 active:bg-slate-300"
+		>
+			View on eBird <ExternalLink size={13} />
+		</a>
+	{/if}
 </div>

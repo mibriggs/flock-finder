@@ -10,9 +10,11 @@
 	import type { DateRange } from 'bits-ui';
 	import type { DateValue } from '@internationalized/date';
 	import { SvelteSet } from 'svelte/reactivity';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
 
 	let drawerOpen = $state(false);
-
 	let filedDropZone: HTMLElement | undefined = $state();
 	let birds: EBirdEntry[] = $state([]);
 	let currentSpecies: string[] = $state(['all']);
@@ -206,7 +208,7 @@
 		</div>
 
 		<div class="flex flex-1">
-			<MapPanel birds={filteredBirds} />
+			<MapPanel birds={filteredBirds} taxonomyMap={data.taxonomyMap} />
 		</div>
 	{:else if fileLoadTracker.isLoading}
 		<div class="hidden w-96 lg:block">

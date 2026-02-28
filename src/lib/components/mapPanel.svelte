@@ -3,7 +3,7 @@
 	import {
 		FullscreenControl,
 		GeoJSONSource,
-		Map,
+		Map as MapboxMap,
 		NavigationControl,
 		Popup,
 		type MapLayerMouseEvent
@@ -14,9 +14,13 @@
 	import { mount, unmount } from 'svelte';
 	import MapPopup from './mapPopup.svelte';
 
-	let { birds }: { birds: EBirdEntry[] } = $props();
+	interface Props {
+		birds: EBirdEntry[];
+		taxonomyMap?: Map<string, string>;
+	}
+	let { birds, taxonomyMap = undefined }: Props = $props();
 	let mapContainer: HTMLDivElement;
-	let map: Map;
+	let map: MapboxMap;
 
 	$effect(() => {
 		const features = birds.map((bird) => ({
@@ -43,7 +47,7 @@
 	});
 
 	$effect(() => {
-		map = new Map({
+		map = new MapboxMap({
 			container: mapContainer,
 			style: 'https://tiles.openfreemap.org/styles/positron',
 			center: [-95, 40],
@@ -80,7 +84,7 @@
 		const coords: Position = bird.geometry.coordinates;
 		const container: HTMLDivElement = document.createElement('div');
 		const popup = new Popup({ closeButton: false });
-
+		const taxonomicOrder = taxonomyMap?.get(bird.properties.scientificName.trim().toLowerCase());
 		const instance = mount(MapPopup, {
 			target: container,
 			props: {
@@ -89,6 +93,7 @@
 				date: bird.properties.date,
 				location: bird.properties.location,
 				count: bird.properties.count,
+				speciesCode: taxonomicOrder,
 				onClose: () => popup.remove()
 			}
 		});
