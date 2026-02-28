@@ -1,7 +1,6 @@
 import * as v from 'valibot';
-import fs from 'fs';
-import path from 'path';
 import Papa from 'papaparse';
+import raw from '../../../data/taxonomy.csv?raw';
 
 const TaxonomyRowSchema = v.object({
 	TAXON_ORDER: v.pipe(v.string(), v.transform(Number)),
@@ -15,9 +14,6 @@ const TaxonomyRowSchema = v.object({
 	SPECIES_GROUP: v.string(),
 	REPORT_AS: v.string()
 });
-
-const taxonomyPath = path.join(process.cwd(), 'data', 'taxonomy.csv');
-const raw = fs.readFileSync(taxonomyPath, 'utf-8');
 
 const { data } = Papa.parse(raw, { header: true, skipEmptyLines: true });
 const rows = data.flatMap((row) => {
