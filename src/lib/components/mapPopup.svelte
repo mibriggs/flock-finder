@@ -24,7 +24,7 @@
 
 <div class="relative flex min-w-[200px] flex-col gap-1 rounded-xl p-2">
 	<button
-		class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white"
+		class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white transition-all hover:bg-red-600 active:scale-90 active:bg-red-700"
 		onclick={onClose}
 	>
 		<X size={14} />
@@ -44,7 +44,7 @@
 			href="https://ebird.org/species/{speciesCode}"
 			target="_blank"
 			rel="noopener noreferrer"
-			class="mt-1 flex items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-200 active:bg-slate-300"
+			class="mt-1 flex items-center justify-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition-all hover:bg-slate-200 active:scale-90 active:bg-slate-300"
 		>
 			View on eBird <ExternalLink size={13} />
 		</a>
