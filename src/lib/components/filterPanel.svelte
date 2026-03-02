@@ -74,6 +74,15 @@
 		</summary>
 		<div class="px-4 pb-3">
 			<DateRangePicker bind:value={dateRange} />
+			{#if dateRange?.start && dateRange?.end}
+				<button
+					transition:fade
+					onclick={() => { dateRange = { start: undefined, end: undefined }; }}
+					class="mt-2 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+				>
+					<X size={13} /> Clear date range
+				</button>
+			{/if}
 		</div>
 	</details>
 
