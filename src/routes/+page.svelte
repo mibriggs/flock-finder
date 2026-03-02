@@ -152,8 +152,6 @@
 	};
 
 	const allowedFiles: string[] = ['.csv'];
-
-	$inspect(currentDateRange);
 </script>
 
 <main class="relative flex h-dvh w-screen gap-3 p-8">
