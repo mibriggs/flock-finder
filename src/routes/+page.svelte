@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { readCsvFile, readFile, isInDateRange } from '$lib';
+	import { readCsvFile, readFile, isInDateRange, MAP_PANEL_CONTEXT, type MapPanelContext } from '$lib';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
 	import FilterPanel from '$lib/components/filterPanel.svelte';
 	import MapPanel from '$lib/components/mapPanel.svelte';
@@ -11,8 +11,12 @@
 	import type { DateValue } from '@internationalized/date';
 	import { SvelteSet } from 'svelte/reactivity';
 	import type { PageProps } from './$types';
+	import { setContext } from 'svelte';
 
 	let { data }: PageProps = $props();
+
+	const mapPanelContext: MapPanelContext = $state({ isMapPanelUpdating: false });
+	setContext(MAP_PANEL_CONTEXT, mapPanelContext);
 
 	let drawerOpen = $state(false);
 	let filedDropZone: HTMLElement | undefined = $state();
@@ -26,10 +30,16 @@
 		const { start, end } = currentDateRange;
 		if (end !== prevEnd && start && end) {
 			committedDateRange = { start, end };
+			mapPanelContext.isMapPanelUpdating = true;
 		} else if (!start && !end) {
 			committedDateRange = { start: undefined, end: undefined };
 		}
 		prevEnd = end;
+	});
+
+	$effect(() => {
+		currentSpecies;
+		mapPanelContext.isMapPanelUpdating = true;
 	});
 
 	let uniqueBirds: SvelteSet<EBirdEntry> = $derived.by(() => {

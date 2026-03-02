@@ -5,6 +5,10 @@
 	import DateRangePicker from './dateRangePicker.svelte';
 	import type { DateRange } from 'bits-ui';
 	import { SvelteSet } from 'svelte/reactivity';
+	import { getContext } from 'svelte';
+	import { MAP_PANEL_CONTEXT, type MapPanelContext } from '$lib';
+
+	const mapPanelContext = getContext<MapPanelContext>(MAP_PANEL_CONTEXT);
 
 	interface Props {
 		disabled?: boolean;
@@ -77,7 +81,10 @@
 			{#if dateRange?.start && dateRange?.end}
 				<button
 					transition:fade
-					onclick={() => { dateRange = { start: undefined, end: undefined }; }}
+					onclick={() => {
+						mapPanelContext.isMapPanelUpdating = true;
+						dateRange = { start: undefined, end: undefined };
+					}}
 					class="mt-2 flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-slate-400 hover:bg-slate-100 hover:text-slate-600"
 				>
 					<X size={13} /> Clear date range

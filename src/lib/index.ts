@@ -7,6 +7,12 @@ import type { FeatureCollection, Feature, GeoJsonProperties, Point } from 'geojs
 import birdImage from '$lib/assets/birdNoBg.png';
 import type { DateValue } from '@internationalized/date';
 
+export const MAP_PANEL_CONTEXT = Symbol('mapPanel');
+
+export interface MapPanelContext {
+	isMapPanelUpdating: boolean;
+}
+
 type DropZoneEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
 
 export function isInDateRange(date: Date, start: DateValue, end: DateValue): boolean {
