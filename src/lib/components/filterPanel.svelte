@@ -6,9 +6,16 @@
 	import type { DateRange } from 'bits-ui';
 	import { SvelteSet } from 'svelte/reactivity';
 	import { getContext } from 'svelte';
-	import { MAP_PANEL_CONTEXT, type MapPanelContext } from '$lib';
+	import {
+		MAP_PANEL_CONTEXT,
+		SATELITE_MAP_CONTEXT,
+		type MapPanelContext,
+		type SateliteMapContext
+	} from '$lib';
+	import Toggle from './toggle.svelte';
 
 	const mapPanelContext = getContext<MapPanelContext>(MAP_PANEL_CONTEXT);
+	const sateliteMapContext = getContext<SateliteMapContext>(SATELITE_MAP_CONTEXT);
 
 	interface Props {
 		disabled?: boolean;
@@ -69,6 +76,14 @@
 </script>
 
 <div class={['flex w-full flex-col gap-2', disabled && 'pointer-events-none opacity-50']}>
+	<label class="flex cursor-pointer items-center justify-start gap-2">
+		<div class="font-semibold text-slate-700">Satelite View</div>
+		<Toggle
+			class="peer-checked:bg-emerald-600"
+			onToggleClicked={(e) => (sateliteMapContext.useSateliteMap = e)}
+		/>
+	</label>
+
 	<details open class="group overflow-hidden rounded-lg border border-slate-200">
 		<summary
 			class="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-semibold text-slate-700 hover:bg-slate-50"

@@ -9,10 +9,19 @@
 		type MapLayerMouseEvent
 	} from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
-	import { addMarkersToMap, formatDate, type BirdFeatureProperties, MAP_PANEL_CONTEXT, type MapPanelContext } from '$lib';
+	import {
+		addMarkersToMap,
+		formatDate,
+		type BirdFeatureProperties,
+		MAP_PANEL_CONTEXT,
+		type MapPanelContext,
+		type SateliteMapContext,
+		SATELITE_MAP_CONTEXT
+	} from '$lib';
 	import type { Feature, Point, Position } from 'geojson';
 	import { getContext, mount, unmount } from 'svelte';
 	import MapPopup from './mapPopup.svelte';
+	import { PUBLIC_MAP_TILER_KEY } from '$env/static/public';
 
 	interface Props {
 		birds: EBirdEntry[];
@@ -22,6 +31,10 @@
 	let mapContainer: HTMLDivElement;
 	let map: MapboxMap;
 	const mapPanelContext = getContext<MapPanelContext>(MAP_PANEL_CONTEXT);
+	const sateliteMapContext = getContext<SateliteMapContext>(SATELITE_MAP_CONTEXT);
+
+	let savedCenter: [number, number] | undefined = $state();
+	let savedZoom: number | undefined = $state();
 
 	$effect(() => {
 		const features = birds.map((bird) => ({
@@ -50,15 +63,19 @@
 	$effect(() => {
 		map = new MapboxMap({
 			container: mapContainer,
-			style: 'https://tiles.openfreemap.org/styles/positron',
-			center: [-95, 40],
-			zoom: 4
+			style: sateliteMapContext.useSateliteMap
+				? `https://api.maptiler.com/maps/hybrid-v4/style.json?key=${PUBLIC_MAP_TILER_KEY}`
+				: 'https://tiles.openfreemap.org/styles/positron',
+			center: savedCenter ?? [-95, 40],
+			zoom: savedZoom ?? 4
 		});
 
 		map.addControl(new NavigationControl());
 		map.addControl(new FullscreenControl());
 		map.on('load', async () => await addMarkersToMap(birds, map));
-		map.on('idle', () => { mapPanelContext.isMapPanelUpdating = false; });
+		map.on('idle', () => {
+			mapPanelContext.isMapPanelUpdating = false;
+		});
 		map.on('click', 'marker-layer', (event: MapLayerMouseEvent) => {
 			let birdsInArea = event.features ? [...event.features] : [];
 			if (birdsInArea.length > 0) {
@@ -79,7 +96,11 @@
 			});
 		});
 
-		return () => map.remove();
+		return () => {
+			savedCenter = [map.getCenter().lng, map.getCenter().lat];
+			savedZoom = map.getZoom();
+			map.remove();
+		};
 	});
 
 	const drawPopupPanel = (bird: Feature<Point, BirdFeatureProperties>) => {
@@ -109,10 +130,19 @@
 <div class="relative h-full w-full">
 	<div id="map" class="h-full w-full text-xs italic" bind:this={mapContainer}></div>
 	{#if mapPanelContext.isMapPanelUpdating}
-		<div class="pointer-events-none absolute right-3 top-3 z-10 flex items-center gap-1.5 rounded-lg bg-white/80 px-3 py-1.5 text-xs text-slate-500 shadow-sm backdrop-blur-sm">
-			<svg class="h-3.5 w-3.5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-				<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+		<div
+			class="pointer-events-none absolute right-3 top-3 z-10 flex items-center gap-1.5 rounded-lg bg-white/80 px-3 py-1.5 text-xs text-slate-500 shadow-sm backdrop-blur-sm"
+		>
+			<svg
+				class="h-3.5 w-3.5 animate-spin"
+				xmlns="http://www.w3.org/2000/svg"
+				fill="none"
+				viewBox="0 0 24 24"
+			>
+				<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+				></circle>
+				<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+				></path>
 			</svg>
 			Updating…
 		</div>

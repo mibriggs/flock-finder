@@ -8,9 +8,13 @@ import birdImage from '$lib/assets/birdNoBg.png';
 import type { DateValue } from '@internationalized/date';
 
 export const MAP_PANEL_CONTEXT = Symbol('mapPanel');
+export const SATELITE_MAP_CONTEXT = Symbol('sateliteMap');
 
 export interface MapPanelContext {
 	isMapPanelUpdating: boolean;
+}
+export interface SateliteMapContext {
+	useSateliteMap: boolean;
 }
 
 type DropZoneEvent = Event & { currentTarget: EventTarget & HTMLInputElement };
