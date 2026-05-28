@@ -175,7 +175,7 @@
 	const allowedFiles: string[] = ['.csv'];
 </script>
 
-<main class="relative flex h-dvh w-screen gap-3 p-8">
+<main class="relative flex h-dvh w-full gap-3 p-8">
 	{#if fileLoadTracker.loadComplete && birds.length > 0}
 		<!-- Mobile drawer toggle -->
 		<button
