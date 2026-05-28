@@ -151,7 +151,7 @@
 			</label>
 		</div>
 		<div
-			class="flex max-h-[calc(100vh-25rem)] flex-col divide-y divide-slate-100 overflow-y-auto px-4 pb-3"
+			class="flex max-h-[calc(100vh-26rem)] flex-col divide-y divide-slate-100 overflow-y-auto px-4 pb-3"
 		>
 			{#each filteredBirds as bird (bird.scientificName)}
 				<label
