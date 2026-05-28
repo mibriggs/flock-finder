@@ -169,6 +169,7 @@
 		currentDateRange = { start: undefined, end: undefined };
 		committedDateRange = { start: undefined, end: undefined };
 		drawerOpen = false;
+		sateliteMapContext.useSateliteMap = false;
 	};
 
 	const allowedFiles: string[] = ['.csv'];
