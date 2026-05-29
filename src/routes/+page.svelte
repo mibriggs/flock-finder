@@ -264,9 +264,17 @@
 			>
 				<p class="font-semibold text-slate-700">How to get your data</p>
 				<ol class="mt-2 flex list-inside list-decimal flex-col gap-1.5">
-					<li>Log in to your <span class="font-medium">eBird</span> account</li>
+					<li>
+						Log in to your <span class="border-b border-dotted border-slate-700 font-medium"
+							><a
+								href="https://secure.birds.cornell.edu/cassso/login?service=https%3A%2F%2Febird.org%2Flogin%2Fcas%3Fportal%3Debird&locale=en_US"
+								target="_blank">eBird</a
+							></span
+						> account
+					</li>
 					<li>Go to <span class="font-medium">My eBird</span></li>
-					<li>Click <span class="font-medium">"Download My Data"</span></li>
+					<li>Click <span class="font-medium">"Download My Data"</span> — <span class="italic">eBird will email you a zip file. If it doesn't arrive within 24 hours, check your spam folder.</span></li>
+					<li>Extract the CSV from the zip file</li>
 					<li>Upload the CSV file below</li>
 				</ol>
 			</div>
