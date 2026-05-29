@@ -10,6 +10,8 @@
 		onFileSelection
 	}: FileDropZoneProps = $props();
 
+	let isDraggedOver: boolean = $state(false);
+
 	const humanReadableExtensions = $derived(
 		allowedExtensions.map((extension) => extension.replace('.', '').toUpperCase())
 	);
@@ -19,10 +21,22 @@
 	for="fileUpload"
 	class={twMerge(
 		'flex cursor-pointer select-none flex-col items-center justify-center rounded-lg border-[3px] border-dashed border-gray-400 bg-gray-100 px-6 py-4 text-gray-600 hover:opacity-70 active:border-green-500',
+		isDraggedOver && 'scale-95 bg-gray-300 opacity-80',
 		className
 	)}
 	bind:this={dropZoneContainer}
 	draggable="false"
+	ondragenter={() => {
+		isDraggedOver = true;
+	}}
+	ondragleave={(e) => {
+		if (!dropZoneContainer?.contains(e.relatedTarget as Node)) {
+			isDraggedOver = false;
+		}
+	}}
+	ondrop={() => {
+		isDraggedOver = false;
+	}}
 >
 	<Upload size="32" />
 	<div class="text-center text-xl">
