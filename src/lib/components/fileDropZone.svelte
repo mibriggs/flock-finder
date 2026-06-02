@@ -10,7 +10,8 @@
 		onFileSelection
 	}: FileDropZoneProps = $props();
 
-	let isDraggedOver: boolean = $state(false);
+	let dragCounter: number = $state(0);
+	let isDraggedOver: boolean = $derived(dragCounter !== 0);
 
 	const humanReadableExtensions = $derived(
 		allowedExtensions.map((extension) => extension.replace('.', '').toUpperCase())
@@ -26,17 +27,9 @@
 	)}
 	bind:this={dropZoneContainer}
 	draggable="false"
-	ondragenter={() => {
-		isDraggedOver = true;
-	}}
-	ondragleave={(e) => {
-		if (!dropZoneContainer?.contains(e.relatedTarget as Node)) {
-			isDraggedOver = false;
-		}
-	}}
-	ondrop={() => {
-		isDraggedOver = false;
-	}}
+	ondragenter={() => dragCounter++}
+	ondragleave={() => dragCounter--}
+	ondrop={() => (dragCounter = 0)}
 >
 	<Upload size="32" />
 	<div class="text-center text-xl">
