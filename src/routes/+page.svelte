@@ -6,8 +6,10 @@
 		MAP_PANEL_CONTEXT,
 		type MapPanelContext,
 		type SateliteMapContext,
-		SATELITE_MAP_CONTEXT
+		SATELITE_MAP_CONTEXT,
+		getCookie
 	} from '$lib';
+	import { browser } from '$app/environment';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
 	import FilterPanel from '$lib/components/filterPanel.svelte';
 	import MapPanel from '$lib/components/mapPanel.svelte';
@@ -25,7 +27,9 @@
 
 	const mapPanelContext: MapPanelContext = $state({ isMapPanelUpdating: false });
 	setContext(MAP_PANEL_CONTEXT, mapPanelContext);
-	const sateliteMapContext: SateliteMapContext = $state({ useSateliteMap: false });
+	const sateliteMapContext: SateliteMapContext = $state({
+		useSateliteMap: browser && getCookie('useSateliteView') === 'true'
+	});
 	setContext(SATELITE_MAP_CONTEXT, sateliteMapContext);
 
 	let drawerOpen = $state(false);
@@ -169,7 +173,6 @@
 		currentDateRange = { start: undefined, end: undefined };
 		committedDateRange = { start: undefined, end: undefined };
 		drawerOpen = false;
-		sateliteMapContext.useSateliteMap = false;
 	};
 
 	const allowedFiles: string[] = ['.csv'];
@@ -273,7 +276,13 @@
 						> account
 					</li>
 					<li>Go to <span class="font-medium">My eBird</span></li>
-					<li>Click <span class="font-medium">"Download My Data"</span> — <span class="italic">eBird will email you a zip file. If it doesn't arrive within 24 hours, check your spam folder.</span></li>
+					<li>
+						Click <span class="font-medium">"Download My Data"</span> —
+						<span class="italic"
+							>eBird will email you a zip file. If it doesn't arrive within 24 hours, check your
+							spam folder.</span
+						>
+					</li>
 					<li>Extract the CSV from the zip file</li>
 					<li>Upload the CSV file below</li>
 				</ol>

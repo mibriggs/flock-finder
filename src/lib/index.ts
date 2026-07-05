@@ -6,9 +6,11 @@ import type { Map } from 'maplibre-gl';
 import type { FeatureCollection, Feature, GeoJsonProperties, Point } from 'geojson';
 import birdImage from '$lib/assets/birdNoBg.png';
 import type { DateValue } from '@internationalized/date';
+import { browser } from '$app/environment';
 
 export const MAP_PANEL_CONTEXT = Symbol('mapPanel');
 export const SATELITE_MAP_CONTEXT = Symbol('sateliteMap');
+const COOKIE_DEFAULTS = 'SameSite=Lax; Secure';
 
 export interface MapPanelContext {
 	isMapPanelUpdating: boolean;
@@ -259,4 +261,59 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 			'icon-allow-overlap': true
 		}
 	});
+}
+
+export function setCookie(
+	name: string,
+	value: string,
+	path: string = '/',
+	expiresInMs: number = 400 * 24 * 60 * 60 * 1000
+) {
+	if (!browser) {
+		throw new Error(
+			'setCookie() can only be used in the browser, make sure to check for browser object first'
+		);
+	}
+
+	const expiresDate = new Date(Date.now() + expiresInMs);
+	const maxAgeSeconds = Math.floor(expiresInMs / 1000);
+
+	const cookieParts: string[] = [
+		`${encodeURIComponent(name)}=${encodeURIComponent(value)}`,
+		`path=${path}`,
+		`expires=${expiresDate.toUTCString()}`,
+		`max-age=${maxAgeSeconds}`,
+		COOKIE_DEFAULTS
+	];
+	document.cookie = cookieParts.join('; ');
+}
+
+export function getCookie(name: string): string | undefined {
+	if (!browser) {
+		throw new Error(
+			'getCookie() can only be used in the browser, make sure to check for browser object first'
+		);
+	}
+
+	const cookies = document.cookie.split('; ');
+	const encodedName = encodeURIComponent(name);
+
+	for (const cookie of cookies) {
+		const [cookieName, ...rest] = cookie.split('=');
+		if (cookieName === encodedName) {
+			return decodeURIComponent(rest.join('='));
+		}
+	}
+
+	return undefined;
+}
+
+export function deleteCookie(name: string, path: string = '/') {
+	if (!browser) {
+		throw new Error(
+			'deleteCookie() can only be used in the browser, make sure to check for browser object first'
+		);
+	}
+
+	document.cookie = `${encodeURIComponent(name)}=; path=${path}; max-age=0; ${COOKIE_DEFAULTS}`;
 }

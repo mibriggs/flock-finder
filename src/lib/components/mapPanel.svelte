@@ -36,6 +36,12 @@
 	let savedCenter: [number, number] | undefined = $state();
 	let savedZoom: number | undefined = $state();
 
+	const getMapStyle = () => {
+		return sateliteMapContext.useSateliteMap
+			? `https://api.maptiler.com/maps/hybrid-v4/style.json?key=${PUBLIC_MAP_TILER_KEY}`
+			: 'https://tiles.openfreemap.org/styles/positron';
+	};
+
 	$effect(() => {
 		const features = birds.map((bird) => ({
 			type: 'Feature' as const,
@@ -63,9 +69,7 @@
 	$effect(() => {
 		map = new MapboxMap({
 			container: mapContainer,
-			style: sateliteMapContext.useSateliteMap
-				? `https://api.maptiler.com/maps/hybrid-v4/style.json?key=${PUBLIC_MAP_TILER_KEY}`
-				: 'https://tiles.openfreemap.org/styles/positron',
+			style: getMapStyle(),
 			center: savedCenter ?? [-95, 40],
 			zoom: savedZoom ?? 4
 		});

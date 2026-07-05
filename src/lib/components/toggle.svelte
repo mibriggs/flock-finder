@@ -3,11 +3,12 @@
 
 	interface Props {
 		class?: string;
+		checked?: boolean;
 		onToggleClicked?: (isChecked: boolean) => void;
 	}
 
 	const checkboxId: string = crypto.randomUUID();
-	let { class: className = '', onToggleClicked = undefined }: Props = $props();
+	let { class: className = '', checked = false, onToggleClicked = undefined }: Props = $props();
 </script>
 
 <div class="flex items-center justify-center">
@@ -15,6 +16,7 @@
 		type="checkbox"
 		class="peer sr-only"
 		id={checkboxId}
+		{checked}
 		onchange={(e) => {
 			if (onToggleClicked) {
 				onToggleClicked(e.currentTarget.checked);

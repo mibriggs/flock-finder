@@ -9,6 +9,7 @@
 	import {
 		MAP_PANEL_CONTEXT,
 		SATELITE_MAP_CONTEXT,
+		setCookie,
 		type MapPanelContext,
 		type SateliteMapContext
 	} from '$lib';
@@ -73,6 +74,11 @@
 		//update the checked value for current
 		e.currentTarget.checked = species.includes(scientificName) && !species.includes('all');
 	};
+
+	const setSateliteView = (e: boolean) => {
+		setCookie('useSateliteView', String(e));
+		sateliteMapContext.useSateliteMap = e;
+	};
 </script>
 
 <div class={['flex w-full flex-col gap-2', disabled && 'pointer-events-none opacity-50']}>
@@ -80,7 +86,8 @@
 		<div class="font-semibold text-slate-700">Satelite View</div>
 		<Toggle
 			class="peer-checked:bg-emerald-600"
-			onToggleClicked={(e) => (sateliteMapContext.useSateliteMap = e)}
+			checked={sateliteMapContext.useSateliteMap}
+			onToggleClicked={setSateliteView}
 		/>
 	</label>
 
