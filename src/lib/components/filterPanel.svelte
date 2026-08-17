@@ -81,7 +81,7 @@
 	};
 </script>
 
-<div class={['flex w-full flex-col gap-2', disabled && 'pointer-events-none opacity-50']}>
+<div class={['flex w-[96%] flex-col gap-2', disabled && 'pointer-events-none opacity-50']}>
 	<label class="flex cursor-pointer items-center justify-start gap-2">
 		<div class="font-semibold text-slate-700">Satelite View</div>
 		<Toggle
@@ -158,7 +158,7 @@
 			</label>
 		</div>
 		<div
-			class="flex max-h-[calc(100vh-26rem)] flex-col divide-y divide-slate-100 overflow-y-auto px-4 pb-3"
+			class="flex max-h-[calc(100vh-27.5rem)] flex-col divide-y divide-slate-100 overflow-y-auto px-4 pb-3"
 		>
 			{#each filteredBirds as bird (bird.scientificName)}
 				<label

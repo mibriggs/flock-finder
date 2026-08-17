@@ -147,7 +147,7 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 
 	const papaparseResult = parsed.data;
 	if (papaparseResult.length === 0) {
-		return { object: [], error: new Error('No usable data to parse.') };
+		return { object: [] };
 	}
 	try {
 		const typedOutput: EBirdEntry[] = papaparseResult.map((row) => parse(birdSchema, row));
