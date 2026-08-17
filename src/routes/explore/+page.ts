@@ -11,8 +11,8 @@ export const load: PageLoad = async ({ fetch, data }) => {
 	let birds: EBirdEntry[] | null = null;
 	let csvData = await response.text();
 
-  if (csv !== null) {
-    csvData = await decompressText(csv);
+	if (csv !== null) {
+		csvData = await decompressText(csv);
 	}
 
 	const { object: birdData, error } = readCsvFile(csvData);

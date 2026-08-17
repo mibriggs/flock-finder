@@ -13,7 +13,7 @@
 	import ResetButton from '$lib/components/resetButton.svelte';
 	import { type EBirdEntry } from '$lib/eBirdEntry';
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
-	import { RotateCcw, SlidersHorizontal, X, Map as MapIcon, ChartColumn } from 'lucide-svelte';
+	import { SlidersHorizontal, X, Map as MapIcon, ChartColumn } from 'lucide-svelte';
 	import type { DateRange } from 'bits-ui';
 	import { Tabs } from 'bits-ui';
 	import type { DateValue } from '@internationalized/date';
@@ -22,6 +22,7 @@
 	import { setContext } from 'svelte';
 	import { goto } from '$app/navigation';
 	import NoResults from '$lib/components/noResults.svelte';
+	import Stats from '$lib/components/stats.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -171,7 +172,7 @@
 			</Tabs.Content>
 
 			<Tabs.Content value="analytics">
-				<div>Testing Testing 123</div>
+				<Stats birds={data.birds} />
 			</Tabs.Content>
 		</Tabs.Root>
 	{:else}
