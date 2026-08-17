@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		readFile,
+		compressText,
 		MAP_PANEL_CONTEXT,
 		type MapPanelContext,
 		type SateliteMapContext,
@@ -82,11 +83,7 @@
 
 		await readFile(userFile).then(async (csvData) => {
 			if (browser) {
-				console.log(new Blob([csvData]).size);
-				new Response(new Blob([csvData]).stream().pipeThrough(new CompressionStream('gzip')))
-					.blob()
-					.then((b) => console.log(b.size));
-				sessionStorage.setItem('csv', csvData);
+				sessionStorage.setItem('csv', await compressText(csvData));
 			}
 		});
 		goto('/explore');

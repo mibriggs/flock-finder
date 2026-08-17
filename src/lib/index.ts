@@ -80,6 +80,37 @@ export function readFile(file: File): Promise<string> {
 	});
 }
 
+function bytesToBinaryString(bytes: Uint8Array): string {
+	let binary = '';
+	const chunkSize = 0x8000; // avoid exceeding the call-stack argument limit on spread
+	for (let i = 0; i < bytes.length; i += chunkSize) {
+		binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+	}
+	return binary;
+}
+
+function binaryStringToBytes(binary: string): Uint8Array {
+	const bytes = new Uint8Array(binary.length);
+	for (let i = 0; i < binary.length; i++) {
+		bytes[i] = binary.charCodeAt(i);
+	}
+	return bytes;
+}
+
+export async function compressText(text: string): Promise<string> {
+	const bytes = new TextEncoder().encode(text);
+	const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'));
+	const compressedBuffer = await new Response(stream).arrayBuffer();
+	return bytesToBinaryString(new Uint8Array(compressedBuffer));
+}
+
+export async function decompressText(binary: string): Promise<string> {
+	const bytes = binaryStringToBytes(binary);
+	const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+	const decompressedBuffer = await new Response(stream).arrayBuffer();
+	return new TextDecoder().decode(decompressedBuffer);
+}
+
 export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 	let actualUnsolvedErrors = 0;
 	const parsed = Papa.parse<Record<string, unknown>>(csvData, {

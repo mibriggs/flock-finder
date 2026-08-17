@@ -1,4 +1,4 @@
-import { readCsvFile } from '$lib';
+import { readCsvFile, decompressText } from '$lib';
 import type { EBirdEntry } from '$lib/eBirdEntry';
 import { redirect } from '@sveltejs/kit';
 import type { PageLoad } from './$types';
@@ -11,8 +11,8 @@ export const load: PageLoad = async ({ fetch, data }) => {
 	let birds: EBirdEntry[] | null = null;
 	let csvData = await response.text();
 
-	if (csv !== null) {
-		csvData = csv;
+  if (csv !== null) {
+    csvData = await decompressText(csv);
 	}
 
 	const { object: birdData, error } = readCsvFile(csvData);
