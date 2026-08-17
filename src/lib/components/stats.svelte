@@ -6,14 +6,16 @@
 	interface Props {
 		birds: EBirdEntry[];
 	}
-	type TimeOfDay = 'Morning' | 'Afternoon' | 'Night';
+	type TimeOfDay = 'Dawn (5-8am)' | 'Morning (8-11am)' | 'Midday (11am-3pm)' | 'Evening (3-7pm)' | 'Night (7pm-5am)';
 
 	let { birds = [] }: Props = $props();
 	let timeOfDayCluster = $derived.by(() => {
 		const map: SvelteMap<TimeOfDay, number> = new SvelteMap([
-			['Morning', 0],
-			['Afternoon', 0],
-			['Night', 0]
+			['Dawn (5-8am)', 0],
+			['Morning (8-11am)', 0],
+			['Midday (11am-3pm)', 0],
+			['Evening (3-7pm)', 0],
+			['Night (7pm-5am)', 0]
 		]);
 		birds
 			.map((bird) => bird.time)
@@ -28,13 +30,17 @@
 
 	const determineTimeOfDay = (timeSeen: string): TimeOfDay => {
 		const time = parseTwelveHourTime(timeSeen);
-		console.log(time);
-		if (time.hour >= 5 && time.hour < 12) {
-			return 'Morning';
-		} else if (time.hour >= 12 && time.hour < 18) {
-			return 'Afternoon';
+		const hour = time.hour;
+		if (hour >= 5 && hour < 8) {
+			return 'Dawn (5-8am)';
+		} else if (hour >= 8 && hour < 11) {
+			return 'Morning (8-11am)';
+		} else if (hour >= 11 && hour < 15) {
+			return 'Midday (11am-3pm)';
+		} else if (hour >= 15 && hour < 19) {
+			return 'Evening (3-7pm)';
 		} else {
-			return 'Night';
+			return 'Night (7pm-5am)';
 		}
 	};
 
@@ -48,9 +54,9 @@
 		if (meridiem.toUpperCase() === 'AM' && hour === 12) hour = 0;
 		return new Time(hour, minute);
 	};
-
-	$effect(() => {
-		console.log(timeOfDayCluster);
-		console.log(birds.length)
-	});
 </script>
+
+<div class="flex h-full w-full flex-1 flex-col items-center justify-center gap-3 text-center">
+	<h1 class="text-3xl font-bold text-slate-800">Coming soon</h1>
+	<p class="max-w-sm text-slate-500">Analytics for your sightings are on the way.</p>
+</div>
