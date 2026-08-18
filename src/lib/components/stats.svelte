@@ -6,7 +6,12 @@
 	interface Props {
 		birds: EBirdEntry[];
 	}
-	type TimeOfDay = 'Dawn (5-8am)' | 'Morning (8-11am)' | 'Midday (11am-3pm)' | 'Evening (3-7pm)' | 'Night (7pm-5am)';
+	type TimeOfDay =
+		| 'Dawn (5-8am)'
+		| 'Morning (8-11am)'
+		| 'Midday (11am-3pm)'
+		| 'Evening (3-7pm)'
+		| 'Night (7pm-5am)';
 
 	let { birds = [] }: Props = $props();
 	let timeOfDayCluster = $derived.by(() => {
