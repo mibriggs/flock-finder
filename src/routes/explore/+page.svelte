@@ -52,7 +52,6 @@
 	});
 
 	$effect(() => {
-		currentSpecies;
 		mapPanelContext.isMapPanelUpdating = true;
 	});
 

@@ -42,7 +42,7 @@
 		"@tailwindcss/typography": "^0.5.15",
 		"bits-ui": "^2.16.2",
 		"layerchart": "^2.2.0",
-		"lucide-svelte": "^0.460.1",
+		"lucide-svelte": "^1.0.1",
 		"maplibre-gl": "^4.7.1",
 		"papaparse": "^5.4.1",
 		"tailwind-merge": "^2.5.5",
