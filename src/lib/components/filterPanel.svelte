@@ -124,7 +124,7 @@
 		</summary>
 		<div class="relative px-4 pb-2 pt-2">
 			<input
-				class="w-full rounded-md border border-slate-200 px-3 py-1.5 pr-7 text-sm outline-none focus:border-slate-400"
+				class="w-full rounded-md border border-slate-200 px-3 py-1.5 pr-7 text-sm outline-hidden focus:border-slate-400"
 				type="text"
 				placeholder="Search species..."
 				bind:value={searchInput}
@@ -152,7 +152,7 @@
 					value="all"
 					checked={species.includes('all')}
 					onchange={(e) => deselectOtherInputs(e)}
-					class="form-checkbox size-4 scale-125 cursor-pointer rounded border-gray-300 text-emerald-600 hover:border-emerald-500 focus:ring-emerald-500/30"
+					class="form-checkbox size-4 scale-125 cursor-pointer rounded-sm border-gray-300 text-emerald-600 hover:border-emerald-500 focus:ring-emerald-500/30"
 				/>
 				All Species ({birds.size})
 			</label>
@@ -172,7 +172,7 @@
 						value={bird.scientificName}
 						checked={species.includes(bird.scientificName)}
 						onchange={(e) => deselectAllInput(e, bird.scientificName)}
-						class="form-checkbox size-4 scale-125 cursor-pointer rounded border-gray-300 text-emerald-600 hover:border-emerald-500 focus:ring-emerald-500/30"
+						class="form-checkbox size-4 scale-125 cursor-pointer rounded-sm border-gray-300 text-emerald-600 hover:border-emerald-500 focus:ring-emerald-500/30"
 					/>
 					<span class="flex flex-col">
 						<span>{bird.commonName}</span>

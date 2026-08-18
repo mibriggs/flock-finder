@@ -122,7 +122,7 @@
 </main>
 
 <!-- <Toggle
-	class="h-10 w-20 after:size-[32px] after:left-1 after:top-1 peer-checked:bg-purple-500 after:peer-checked:translate-x-10 mb-24"
+	class="h-10 w-20 after:size-[32px] after:left-1 after:top-1 peer-checked:bg-purple-500 peer-checked:after:translate-x-10 mb-24"
 /> -->
 <!-- No use case besides just wanted documentation on how this could be done in tw -->
 

@@ -127,7 +127,7 @@
 				<!-- Mobile drawer toggle -->
 				<button
 					onclick={() => (drawerOpen = true)}
-					class="fixed left-4 top-4 z-20 rounded-lg border border-slate-300 bg-white p-2 shadow-sm lg:hidden"
+					class="fixed left-4 top-4 z-20 rounded-lg border border-slate-300 bg-white p-2 shadow-xs lg:hidden"
 				>
 					<SlidersHorizontal size={20} class="text-slate-600" />
 				</button>
@@ -153,7 +153,7 @@
 						<div class="mb-3 flex justify-end lg:hidden">
 							<button
 								onclick={() => (drawerOpen = false)}
-								class="flex items-center gap-1 rounded-full bg-red-500 p-2 text-sm font-medium text-white shadow-md transition-all active:scale-90 active:shadow-sm"
+								class="flex items-center gap-1 rounded-full bg-red-500 p-2 text-sm font-medium text-white shadow-md transition-all active:scale-90 active:shadow-xs"
 							>
 								<X size={14} />
 							</button>

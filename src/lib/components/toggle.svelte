@@ -25,7 +25,7 @@
 	/>
 	<label
 		class={twMerge(
-			"relative inline-block h-5 w-10 cursor-pointer items-center justify-center rounded-3xl bg-gray-400 after:absolute after:left-[1px] after:top-[1px] after:size-[18px] after:rounded-full after:bg-white after:transition-all after:duration-300 after:content-[''] peer-checked:bg-green-400 after:peer-checked:translate-x-[20px]",
+			"relative inline-block h-5 w-10 cursor-pointer items-center justify-center rounded-3xl bg-gray-400 after:absolute after:left-px after:top-px after:size-4.5 after:rounded-full after:bg-white after:transition-all after:duration-300 after:content-[''] peer-checked:bg-green-400 peer-checked:after:translate-x-5",
 			className
 		)}
 		for={checkboxId}
