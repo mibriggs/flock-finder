@@ -122,7 +122,7 @@
 			Species
 			<ChevronDown class="h-4 w-4 transition-transform duration-500 group-open:rotate-180" />
 		</summary>
-		<div class="relative px-4 pb-2 pt-2">
+		<div class="relative px-4 pt-2 pb-2">
 			<input
 				class="w-full rounded-md border border-slate-200 px-3 py-1.5 pr-7 text-sm outline-hidden focus:border-slate-400"
 				type="text"
@@ -132,7 +132,7 @@
 			{#if searchInput.trim() !== ''}
 				<button
 					transition:fade
-					class="absolute right-6 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+					class="absolute top-1/2 right-6 -translate-y-1/2 text-slate-400 hover:text-slate-600"
 					onclick={() => (searchInput = '')}
 					aria-label="Clear search"
 				>
@@ -142,7 +142,7 @@
 		</div>
 		<div class="border-b border-slate-100 px-4">
 			<label
-				class="flex cursor-pointer select-none items-center gap-2 py-1.5 text-sm text-slate-700"
+				class="flex cursor-pointer items-center gap-2 py-1.5 text-sm text-slate-700 select-none"
 				for="all"
 			>
 				<input
@@ -162,7 +162,7 @@
 		>
 			{#each filteredBirds as bird (bird.scientificName)}
 				<label
-					class="flex cursor-pointer select-none items-center gap-2 py-1.5 text-sm text-slate-700"
+					class="flex cursor-pointer items-center gap-2 py-1.5 text-sm text-slate-700 select-none"
 					for={bird.scientificName}
 				>
 					<input
@@ -176,7 +176,7 @@
 					/>
 					<span class="flex flex-col">
 						<span>{bird.commonName}</span>
-						<span class="text-xs italic text-slate-400">{bird.scientificName}</span>
+						<span class="text-xs text-slate-400 italic">{bird.scientificName}</span>
 					</span>
 				</label>
 			{/each}

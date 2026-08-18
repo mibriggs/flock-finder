@@ -1,11 +1,13 @@
 <script lang="ts">
 	import type { EBirdEntry } from '$lib/eBirdEntry';
 	import { Time } from '@internationalized/date';
+	import { defaultChartPadding, LineChart } from 'layerchart';
 	import { SvelteMap } from 'svelte/reactivity';
 
 	interface Props {
 		birds: EBirdEntry[];
 	}
+
 	type TimeOfDay =
 		| 'Dawn (5-8am)'
 		| 'Morning (8-11am)'
@@ -14,6 +16,7 @@
 		| 'Night (7pm-5am)';
 
 	let { birds = [] }: Props = $props();
+
 	let timeOfDayCluster = $derived.by(() => {
 		const map: SvelteMap<TimeOfDay, number> = new SvelteMap([
 			['Dawn (5-8am)', 0],

@@ -135,7 +135,7 @@
 	<div id="map" class="h-full w-full text-xs italic" bind:this={mapContainer}></div>
 	{#if mapPanelContext.isMapPanelUpdating}
 		<div
-			class="pointer-events-none absolute right-3 top-3 z-10 flex items-center gap-1.5 rounded-lg bg-white/80 px-3 py-1.5 text-xs text-slate-500 shadow-xs backdrop-blur-xs"
+			class="pointer-events-none absolute top-3 right-3 z-10 flex items-center gap-1.5 rounded-lg bg-white/80 px-3 py-1.5 text-xs text-slate-500 shadow-xs backdrop-blur-xs"
 		>
 			<svg
 				class="h-3.5 w-3.5 animate-spin"

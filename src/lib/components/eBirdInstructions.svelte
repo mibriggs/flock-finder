@@ -1,5 +1,5 @@
 <div
-	class="absolute left-1/2 top-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 text-center"
+	class="absolute top-1/2 left-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 text-center"
 >
 	<h1 class="text-3xl font-bold text-slate-800">Your bird sightings, on a map</h1>
 	<p class="mt-3 text-slate-500">

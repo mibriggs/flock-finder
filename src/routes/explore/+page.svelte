@@ -101,7 +101,7 @@
 
 <main class="relative flex h-dvh w-full gap-3 p-8">
 	{#if data.birds.length > 0}
-		<div class="absolute right-8 top-8 z-20">
+		<div class="absolute top-8 right-8 z-20">
 			<ResetButton onclick={handleReset} />
 		</div>
 
@@ -127,7 +127,7 @@
 				<!-- Mobile drawer toggle -->
 				<button
 					onclick={() => (drawerOpen = true)}
-					class="fixed left-4 top-4 z-20 rounded-lg border border-slate-300 bg-white p-2 shadow-xs lg:hidden"
+					class="fixed top-4 left-4 z-20 rounded-lg border border-slate-300 bg-white p-2 shadow-xs lg:hidden"
 				>
 					<SlidersHorizontal size={20} class="text-slate-600" />
 				</button>
@@ -144,7 +144,7 @@
 				<!-- Sidebar / Drawer -->
 				<div
 					class={[
-						'fixed left-0 top-0 z-30 flex h-full w-4/5 max-w-sm flex-col justify-between gap-2 rounded-r-xl bg-white p-4 shadow-2xl transition-transform duration-300 lg:static lg:h-auto lg:w-96 lg:translate-x-0 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none',
+						'fixed top-0 left-0 z-30 flex h-full w-4/5 max-w-sm flex-col justify-between gap-2 rounded-r-xl bg-white p-4 shadow-2xl transition-transform duration-300 lg:static lg:h-auto lg:w-96 lg:translate-x-0 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none',
 						drawerOpen ? 'translate-x-0 shadow-xl' : '-translate-x-full'
 					]}
 				>
