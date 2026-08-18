@@ -1,7 +1,7 @@
 <script lang="ts">
+	import { parseTime } from '$lib';
 	import type { EBirdEntry } from '$lib/eBirdEntry';
-	import { Time } from '@internationalized/date';
-	import { defaultChartPadding, LineChart } from 'layerchart';
+	import { BarChart } from 'layerchart';
 	import { SvelteMap } from 'svelte/reactivity';
 
 	interface Props {
@@ -17,7 +17,7 @@
 
 	let { birds = [] }: Props = $props();
 
-	let timeOfDayCluster = $derived.by(() => {
+	let timeOfDayCluster: { timeOfDay: TimeOfDay; value: number }[] = $derived.by(() => {
 		const map: SvelteMap<TimeOfDay, number> = new SvelteMap([
 			['Dawn (5-8am)', 0],
 			['Morning (8-11am)', 0],
@@ -33,11 +33,16 @@
 				const oldCount = map.get(timeOfDay) ?? 0;
 				map.set(timeOfDay, oldCount + 1);
 			});
-		return map;
+
+		const asArray: { timeOfDay: TimeOfDay; value: number }[] = [];
+		map.forEach((val, key) => {
+			asArray.push({ timeOfDay: key, value: val });
+		});
+		return asArray;
 	});
 
 	const determineTimeOfDay = (timeSeen: string): TimeOfDay => {
-		const time = parseTwelveHourTime(timeSeen);
+		const time = parseTime(timeSeen);
 		const hour = time.hour;
 		if (hour >= 5 && hour < 8) {
 			return 'Dawn (5-8am)';
@@ -51,20 +56,22 @@
 			return 'Night (7pm-5am)';
 		}
 	};
-
-	const parseTwelveHourTime = (input: string): Time => {
-		const match = input.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-		if (!match) throw new Error(`Invalid time string: ${input}`);
-		const [, hourStr, minuteStr, meridiem] = match;
-		let hour = parseInt(hourStr, 10);
-		const minute = parseInt(minuteStr, 10);
-		if (meridiem.toUpperCase() === 'PM' && hour !== 12) hour += 12;
-		if (meridiem.toUpperCase() === 'AM' && hour === 12) hour = 0;
-		return new Time(hour, minute);
-	};
 </script>
 
-<div class="flex h-full w-full flex-1 flex-col items-center justify-center gap-3 text-center">
+<!-- <div class="flex h-full w-full flex-1 flex-col items-center justify-center gap-3 text-center">
 	<h1 class="text-3xl font-bold text-slate-800">Coming soon</h1>
 	<p class="max-w-sm text-slate-500">Analytics for your sightings are on the way.</p>
+</div> -->
+
+<div class="flex w-full flex-col items-center gap-2">
+	<p class="text-lg font-semibold italic">Total Sightings per Time of Day</p>
+	<div class="w-full md:w-3/4 lg:w-1/2">
+		<BarChart
+			data={timeOfDayCluster}
+			x="timeOfDay"
+			y="value"
+			height={300}
+			props={{ bars: { color: '#007a55', width: 50 } }}
+		/>
+	</div>
 </div>

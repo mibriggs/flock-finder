@@ -5,12 +5,14 @@ import { birdSchema, type EBirdEntry } from './eBirdEntry';
 import type { Map } from 'maplibre-gl';
 import type { FeatureCollection, Feature, GeoJsonProperties, Point } from 'geojson';
 import birdImage from '$lib/assets/birdNoBg.png';
-import type { DateValue } from '@internationalized/date';
+import { Time, type DateValue } from '@internationalized/date';
 import { browser } from '$app/environment';
 
 export const MAP_PANEL_CONTEXT = Symbol('mapPanel');
 export const SATELITE_MAP_CONTEXT = Symbol('sateliteMap');
 const COOKIE_DEFAULTS = 'SameSite=Lax; Secure';
+const TWENTY_FOUR_HOUR_TIME_REGEX = /^([01]?\d|2[0-3]):[0-5]\d$/;
+const TWELVE_HOUR_TIME_REGEX = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i;
 
 export interface MapPanelContext {
 	isMapPanelUpdating: boolean;
@@ -348,3 +350,30 @@ export function deleteCookie(name: string, path: string = '/') {
 
 	document.cookie = `${encodeURIComponent(name)}=; path=${path}; max-age=0; ${COOKIE_DEFAULTS}`;
 }
+
+export const parseTime = (input: string): Time => {
+	const trimmed = input.trim();
+	if (TWENTY_FOUR_HOUR_TIME_REGEX.test(trimmed)) {
+		return parseTwentyFourHourTime(trimmed);
+	}
+	if (TWELVE_HOUR_TIME_REGEX.test(trimmed)) {
+		return parseTwelveHourTime(trimmed);
+	}
+	throw new Error(`Invalid time string: ${input}`);
+};
+
+const parseTwentyFourHourTime = (input: string): Time => {
+	const [hourStr, minuteStr] = input.split(':');
+	return new Time(parseInt(hourStr, 10), parseInt(minuteStr, 10));
+};
+
+const parseTwelveHourTime = (input: string): Time => {
+	const match = input.match(TWELVE_HOUR_TIME_REGEX);
+	if (!match) throw new Error(`Invalid time string: ${input}`);
+	const [, hourStr, minuteStr, meridiem] = match;
+	let hour = parseInt(hourStr, 10);
+	const minute = parseInt(minuteStr, 10);
+	if (meridiem.toUpperCase() === 'PM' && hour !== 12) hour += 12;
+	if (meridiem.toUpperCase() === 'AM' && hour === 12) hour = 0;
+	return new Time(hour, minute);
+};

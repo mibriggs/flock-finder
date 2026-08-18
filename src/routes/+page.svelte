@@ -116,7 +116,9 @@
 		<p
 			class="absolute bottom-[1%] left-1/2 -translate-x-1/2 text-sm whitespace-nowrap text-slate-400"
 		>
-			or <button class="underline hover:text-slate-600" onclick={loadDemo}>try a demo</button>
+			or <button class="cursor-pointer underline hover:text-slate-600" onclick={loadDemo}
+				>try a demo</button
+			>
 		</p>
 	</div>
 </main>

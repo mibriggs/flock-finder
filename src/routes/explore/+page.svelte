@@ -109,14 +109,14 @@
 			<Tabs.List class="mb-4 flex gap-1 border-b border-slate-200">
 				<Tabs.Trigger
 					value="map"
-					class="inline-flex items-center gap-2 rounded-t-md border-b-2 border-transparent px-4 py-2 text-sm font-medium text-slate-400 transition-colors hover:text-slate-700 data-[state=active]:border-emerald-600 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
+					class="inline-flex cursor-pointer items-center gap-2 rounded-t-md border-b-2 border-transparent px-4 py-2 text-sm font-medium text-slate-400 transition-colors hover:text-slate-700 data-[state=active]:border-emerald-600 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
 				>
 					<MapIcon size={16} />
 					Map
 				</Tabs.Trigger>
 				<Tabs.Trigger
 					value="analytics"
-					class="inline-flex items-center gap-2 rounded-t-md border-b-2 border-transparent px-4 py-2 text-sm font-medium text-slate-400 transition-colors hover:text-slate-700 data-[state=active]:border-emerald-600 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
+					class="inline-flex cursor-pointer items-center gap-2 rounded-t-md border-b-2 border-transparent px-4 py-2 text-sm font-medium text-slate-400 transition-colors hover:text-slate-700 data-[state=active]:border-emerald-600 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
 				>
 					<ChartColumn size={16} />
 					Analytics
