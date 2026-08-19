@@ -92,7 +92,7 @@ function bytesToBinaryString(bytes: Uint8Array): string {
 }
 
 function binaryStringToBytes(binary: string): Uint8Array<ArrayBuffer> {
-	const bytes: Uint8Array<ArrayBuffer>= new Uint8Array(binary.length);
+	const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(binary.length);
 	for (let i = 0; i < binary.length; i++) {
 		bytes[i] = binary.charCodeAt(i);
 	}
