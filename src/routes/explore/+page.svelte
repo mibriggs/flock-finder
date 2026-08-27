@@ -23,8 +23,21 @@
 	import { goto } from '$app/navigation';
 	import NoResults from '$lib/components/noResults.svelte';
 	import Stats from '$lib/components/stats.svelte';
+	import { clearCsv } from '$lib/csvStore';
+	import { endTotalUploadTimerIfActive } from '$lib/perfTimer';
+	import { onMount } from 'svelte';
 
 	let { data }: PageProps = $props();
+
+	console.time('[timing] explore page script init -> onMount (sync render + child mounts)');
+	onMount(() => {
+		console.timeEnd('[timing] explore page script init -> onMount (sync render + child mounts)');
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				endTotalUploadTimerIfActive();
+			});
+		});
+	});
 
 	const mapPanelContext: MapPanelContext = $state({ isMapPanelUpdating: false });
 	setContext(MAP_PANEL_CONTEXT, mapPanelContext);
@@ -56,6 +69,7 @@
 	});
 
 	let uniqueBirds: SvelteSet<EBirdEntry> = $derived.by(() => {
+		console.time('[timing] uniqueBirds dedup');
 		const dateFilteredBirds =
 			committedDateRange.start && committedDateRange.end
 				? data.birds.filter((bird) =>
@@ -70,9 +84,12 @@
 				seenNames.add(bird.commonName.trim().toWellFormed());
 			}
 		});
-		return new SvelteSet(seen.values());
+		const result = new SvelteSet(seen.values());
+		console.timeEnd('[timing] uniqueBirds dedup');
+		return result;
 	});
 	let filteredBirds: EBirdEntry[] = $derived.by(() => {
+		console.time('[timing] filteredBirds filter');
 		let newBirds = data.birds;
 		if (currentSpecies.indexOf('all') === -1) {
 			newBirds = newBirds.filter((bird) => currentSpecies.includes(bird.scientificName));
@@ -82,18 +99,17 @@
 			const end = committedDateRange.end;
 			newBirds = newBirds.filter((bird) => isInDateRange(bird.date, start, end));
 		}
+		console.timeEnd('[timing] filteredBirds filter');
 		return newBirds;
 	});
 
-	const handleReset = () => {
+	const handleReset = async () => {
 		fileLoadTracker.reset();
 		currentSpecies = ['all'];
 		currentDateRange = { start: undefined, end: undefined };
 		committedDateRange = { start: undefined, end: undefined };
 		drawerOpen = false;
-		if (browser) {
-			sessionStorage.clear();
-		}
+		await clearCsv();
 		goto('/');
 	};
 </script>
@@ -114,11 +130,11 @@
 					Map
 				</Tabs.Trigger>
 				<Tabs.Trigger
-					value="analytics"
+					value="stats"
 					class="inline-flex cursor-pointer items-center gap-2 rounded-t-md border-b-2 border-transparent px-4 py-2 text-sm font-medium text-slate-400 transition-colors hover:text-slate-700 data-[state=active]:border-emerald-600 data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
 				>
 					<ChartColumn size={16} />
-					Analytics
+					Statistics
 				</Tabs.Trigger>
 			</Tabs.List>
 
@@ -170,7 +186,7 @@
 				</div>
 			</Tabs.Content>
 
-			<Tabs.Content value="analytics" class="hidden min-h-0 flex-1 data-[state=active]:flex">
+			<Tabs.Content value="stats" class="hidden min-h-0 flex-1 data-[state=active]:flex">
 				<Stats birds={data.birds} />
 			</Tabs.Content>
 		</Tabs.Root>

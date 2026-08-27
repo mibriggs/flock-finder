@@ -1,13 +1,14 @@
 <script lang="ts">
 	import {
 		readFile,
-		compressText,
 		MAP_PANEL_CONTEXT,
 		type MapPanelContext,
 		type SateliteMapContext,
 		SATELITE_MAP_CONTEXT,
 		getCookie
 	} from '$lib';
+	import { saveCsv } from '$lib/csvStore';
+	import { startTotalUploadTimer } from '$lib/perfTimer';
 	import { browser } from '$app/environment';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
@@ -81,12 +82,28 @@
 			return;
 		}
 
-		await readFile(userFile).then(async (csvData) => {
-			if (browser) {
-				sessionStorage.setItem('csv', await compressText(csvData));
+		startTotalUploadTimer();
+
+		try {
+			console.time('[timing] FileReader read');
+			const csvData = await readFile(userFile);
+			console.timeEnd('[timing] FileReader read');
+
+			console.time('[timing] saveCsv (IndexedDB write)');
+			await saveCsv(csvData);
+			console.timeEnd('[timing] saveCsv (IndexedDB write)');
+		} catch (error) {
+			if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+				await launchErrorToast('This file is too large to load. Try a smaller export.');
+			} else {
+				await launchErrorToast('Something went wrong loading your data. Please try again.');
 			}
-		});
-		goto('/explore');
+			return;
+		}
+
+		console.time('[timing] goto(/explore) navigation + load()');
+		await goto('/explore');
+		console.timeEnd('[timing] goto(/explore) navigation + load()');
 	};
 
 	const loadDemo = async () => {

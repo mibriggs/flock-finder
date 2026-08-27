@@ -30,13 +30,15 @@ export function isInDateRange(date: Date, start: DateValue, end: DateValue): boo
 	return sightedDate >= startDate && sightedDate <= endDate;
 }
 
+const DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
+	weekday: 'long',
+	month: 'short',
+	day: 'numeric',
+	year: 'numeric'
+});
+
 export const formatDate = (date: Date) => {
-	return new Intl.DateTimeFormat('en-US', {
-		weekday: 'long',
-		month: 'short',
-		day: 'numeric',
-		year: 'numeric'
-	}).format(date);
+	return DATE_FORMATTER.format(date);
 };
 
 export interface FileDropZoneProps {
@@ -82,39 +84,9 @@ export function readFile(file: File): Promise<string> {
 	});
 }
 
-function bytesToBinaryString(bytes: Uint8Array): string {
-	let binary = '';
-	const chunkSize = 0x8000; // avoid exceeding the call-stack argument limit on spread
-	for (let i = 0; i < bytes.length; i += chunkSize) {
-		binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
-	}
-	return binary;
-}
-
-function binaryStringToBytes(binary: string): Uint8Array<ArrayBuffer> {
-	const bytes: Uint8Array<ArrayBuffer> = new Uint8Array(binary.length);
-	for (let i = 0; i < binary.length; i++) {
-		bytes[i] = binary.charCodeAt(i);
-	}
-	return bytes;
-}
-
-export async function compressText(text: string): Promise<string> {
-	const bytes = new TextEncoder().encode(text);
-	const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'));
-	const compressedBuffer = await new Response(stream).arrayBuffer();
-	return bytesToBinaryString(new Uint8Array(compressedBuffer));
-}
-
-export async function decompressText(binary: string): Promise<string> {
-	const bytes = binaryStringToBytes(binary);
-	const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-	const decompressedBuffer = await new Response(stream).arrayBuffer();
-	return new TextDecoder().decode(decompressedBuffer);
-}
-
 export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 	let actualUnsolvedErrors = 0;
+	console.time('[timing] Papa.parse (tokenize + dynamicTyping + backfill)');
 	const parsed = Papa.parse<Record<string, unknown>>(csvData, {
 		header: true,
 		dynamicTyping: true,
@@ -148,28 +120,30 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 			return headerMap[header] || header;
 		},
 		complete: (results) => {
+			console.log(`[timing] Papa.parse produced ${results.data.length} rows`);
+			console.time('[timing] backfill missing/null fields');
 			const keys = results.meta.fields || [];
 			const newData = results.data.map((row) => {
 				keys.forEach((key) => {
-					if (!Object.keys(row).includes(key)) {
-						row[key] = undefined;
-					} else if (row[key] === null) {
+					if (row[key] === undefined || row[key] === null) {
 						row[key] = undefined;
 					}
 				});
 				return row;
 			});
+			console.timeEnd('[timing] backfill missing/null fields');
 
 			const unsolvedErrors = results.errors.filter((error) => {
 				const rowIndex = error.row ? error.row : 0;
 				const isSolved =
 					error.code === 'TooFewFields' &&
-					Object.keys(newData[rowIndex]).every((objKey) => keys.includes(objKey));
+					Object.keys(newData[rowIndex]).length === keys.length;
 				return !isSolved;
 			});
 			actualUnsolvedErrors = unsolvedErrors.length;
 		}
 	});
+	console.timeEnd('[timing] Papa.parse (tokenize + dynamicTyping + backfill)');
 
 	if (actualUnsolvedErrors > 0) {
 		return {
@@ -183,7 +157,9 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 		return { object: [] };
 	}
 	try {
+		console.time('[timing] valibot row validation');
 		const typedOutput: EBirdEntry[] = papaparseResult.map((row) => parse(birdSchema, row));
+		console.timeEnd('[timing] valibot row validation');
 		return { object: typedOutput };
 	} catch (error: unknown) {
 		console.error(error);
@@ -192,6 +168,7 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 }
 
 export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
+	console.time('[timing] build GeoJSON features');
 	const birdMarkers: Feature<Point, GeoJsonProperties>[] = birds.map((bird) => {
 		return {
 			type: 'Feature',
@@ -216,7 +193,9 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 		type: 'FeatureCollection',
 		features: birdMarkers
 	};
+	console.timeEnd('[timing] build GeoJSON features');
 
+	console.time('[timing] map.addSource (parses+indexes geojson, sync)');
 	map.addSource('markers', {
 		type: 'geojson',
 		data: geoJson,
@@ -224,6 +203,7 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 		clusterMaxZoom: 8,
 		clusterRadius: 20
 	});
+	console.timeEnd('[timing] map.addSource (parses+indexes geojson, sync)');
 
 	map.addLayer({
 		id: 'cluster-halo',
@@ -281,7 +261,9 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 		paint: { 'text-color': '#ffffff' }
 	});
 
+	console.time('[timing] loadImage (network + decode)');
 	const loadedBirdImage = await map.loadImage(birdImage);
+	console.timeEnd('[timing] loadImage (network + decode)');
 	map.addImage('birdIcon', loadedBirdImage.data);
 	map.addLayer({
 		id: 'marker-layer',

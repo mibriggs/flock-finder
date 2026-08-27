@@ -2,7 +2,6 @@
 	import { parseTime } from '$lib';
 	import type { EBirdEntry } from '$lib/eBirdEntry';
 	import { BarChart } from 'layerchart';
-	import { SvelteMap } from 'svelte/reactivity';
 	import { scaleBand } from 'd3-scale';
 
 	interface Props {
@@ -19,7 +18,8 @@
 	let { birds = [] }: Props = $props();
 
 	let timeOfDayCluster: { timeOfDay: TimeOfDay; value: number }[] = $derived.by(() => {
-		const map: SvelteMap<TimeOfDay, number> = new SvelteMap([
+		console.time('[timing] timeOfDayHistogram: build cluster');
+		const map: Map<TimeOfDay, number> = new Map([
 			['Dawn (5-8am)', 0],
 			['Morning (8-11am)', 0],
 			['Midday (11am-3pm)', 0],
@@ -39,6 +39,7 @@
 		map.forEach((val, key) => {
 			asArray.push({ timeOfDay: key, value: val });
 		});
+		console.timeEnd('[timing] timeOfDayHistogram: build cluster');
 		return asArray;
 	});
 

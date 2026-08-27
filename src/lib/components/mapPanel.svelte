@@ -74,10 +74,20 @@
 			zoom: savedZoom ?? 4
 		});
 
+		let hasLoggedFirstIdle = false;
 		map.addControl(new NavigationControl());
 		map.addControl(new FullscreenControl());
-		map.on('load', async () => await addMarkersToMap(birds, map));
+		map.on('load', async () => {
+			console.time('[timing] addMarkersToMap total');
+			await addMarkersToMap(birds, map);
+			console.timeEnd('[timing] addMarkersToMap total');
+			console.time('[timing] load -> idle (tile/cluster render settle)');
+		});
 		map.on('idle', () => {
+			if (!hasLoggedFirstIdle) {
+				hasLoggedFirstIdle = true;
+				console.timeEnd('[timing] load -> idle (tile/cluster render settle)');
+			}
 			mapPanelContext.isMapPanelUpdating = false;
 		});
 		map.on('click', 'marker-layer', (event: MapLayerMouseEvent) => {
