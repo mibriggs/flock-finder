@@ -86,7 +86,6 @@ export function readFile(file: File): Promise<string> {
 
 export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 	let actualUnsolvedErrors = 0;
-	console.time('[timing] Papa.parse (tokenize + dynamicTyping + backfill)');
 	const parsed = Papa.parse<Record<string, unknown>>(csvData, {
 		header: true,
 		dynamicTyping: true,
@@ -120,8 +119,6 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 			return headerMap[header] || header;
 		},
 		complete: (results) => {
-			console.log(`[timing] Papa.parse produced ${results.data.length} rows`);
-			console.time('[timing] backfill missing/null fields');
 			const keys = results.meta.fields || [];
 			const newData = results.data.map((row) => {
 				keys.forEach((key) => {
@@ -131,7 +128,6 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 				});
 				return row;
 			});
-			console.timeEnd('[timing] backfill missing/null fields');
 
 			const unsolvedErrors = results.errors.filter((error) => {
 				const rowIndex = error.row ? error.row : 0;
@@ -142,7 +138,6 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 			actualUnsolvedErrors = unsolvedErrors.length;
 		}
 	});
-	console.timeEnd('[timing] Papa.parse (tokenize + dynamicTyping + backfill)');
 
 	if (actualUnsolvedErrors > 0) {
 		return {
@@ -156,9 +151,7 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 		return { object: [] };
 	}
 	try {
-		console.time('[timing] valibot row validation');
 		const typedOutput: EBirdEntry[] = papaparseResult.map((row) => parse(birdSchema, row));
-		console.timeEnd('[timing] valibot row validation');
 		return { object: typedOutput };
 	} catch (error: unknown) {
 		console.error(error);
@@ -167,7 +160,6 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 }
 
 export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
-	console.time('[timing] build GeoJSON features');
 	const birdMarkers: Feature<Point, GeoJsonProperties>[] = birds.map((bird) => {
 		return {
 			type: 'Feature',
@@ -192,9 +184,7 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 		type: 'FeatureCollection',
 		features: birdMarkers
 	};
-	console.timeEnd('[timing] build GeoJSON features');
 
-	console.time('[timing] map.addSource (parses+indexes geojson, sync)');
 	map.addSource('markers', {
 		type: 'geojson',
 		data: geoJson,
@@ -202,7 +192,6 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 		clusterMaxZoom: 8,
 		clusterRadius: 20
 	});
-	console.timeEnd('[timing] map.addSource (parses+indexes geojson, sync)');
 
 	map.addLayer({
 		id: 'cluster-halo',
@@ -260,9 +249,7 @@ export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
 		paint: { 'text-color': '#ffffff' }
 	});
 
-	console.time('[timing] loadImage (network + decode)');
 	const loadedBirdImage = await map.loadImage(birdImage);
-	console.timeEnd('[timing] loadImage (network + decode)');
 	map.addImage('birdIcon', loadedBirdImage.data);
 	map.addLayer({
 		id: 'marker-layer',

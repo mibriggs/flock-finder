@@ -18,7 +18,6 @@
 	let { birds = [] }: Props = $props();
 
 	let timeOfDayCluster: { timeOfDay: TimeOfDay; value: number }[] = $derived.by(() => {
-		console.time('[timing] timeOfDayHistogram: build cluster');
 		const map: Map<TimeOfDay, number> = new Map([
 			['Dawn (5-8am)', 0],
 			['Morning (8-11am)', 0],
@@ -39,7 +38,6 @@
 		map.forEach((val, key) => {
 			asArray.push({ timeOfDay: key, value: val });
 		});
-		console.timeEnd('[timing] timeOfDayHistogram: build cluster');
 		return asArray;
 	});
 

@@ -8,7 +8,6 @@
 		getCookie
 	} from '$lib';
 	import { saveCsv } from '$lib/csvStore';
-	import { startTotalUploadTimer } from '$lib/perfTimer';
 	import { browser } from '$app/environment';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
@@ -82,16 +81,9 @@
 			return;
 		}
 
-		startTotalUploadTimer();
-
 		try {
-			console.time('[timing] FileReader read');
 			const csvData = await readFile(userFile);
-			console.timeEnd('[timing] FileReader read');
-
-			console.time('[timing] saveCsv (IndexedDB write)');
 			await saveCsv(csvData);
-			console.timeEnd('[timing] saveCsv (IndexedDB write)');
 		} catch (error) {
 			if (error instanceof DOMException && error.name === 'QuotaExceededError') {
 				await launchErrorToast('This file is too large to load. Try a smaller export.');
@@ -101,9 +93,7 @@
 			return;
 		}
 
-		console.time('[timing] goto(/explore) navigation + load()');
-		await goto('/explore');
-		console.timeEnd('[timing] goto(/explore) navigation + load()');
+		goto('/explore');
 	};
 
 	const loadDemo = async () => {

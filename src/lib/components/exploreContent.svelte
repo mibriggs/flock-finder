@@ -10,12 +10,11 @@
 	import { Tabs } from 'bits-ui';
 	import type { DateValue } from '@internationalized/date';
 	import { SvelteSet } from 'svelte/reactivity';
-	import { getContext, onMount } from 'svelte';
+	import { getContext } from 'svelte';
 	import { goto } from '$app/navigation';
 	import NoResults from '$lib/components/noResults.svelte';
 	import Stats from '$lib/components/stats.svelte';
 	import { clearCsv } from '$lib/csvStore';
-	import { endTotalUploadTimerIfActive } from '$lib/perfTimer';
 
 	interface Props {
 		birds: EBirdEntry[];
@@ -24,14 +23,6 @@
 	let { birds, taxonomyMap = undefined }: Props = $props();
 
 	const mapPanelContext = getContext<MapPanelContext>(MAP_PANEL_CONTEXT);
-
-	onMount(() => {
-		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
-				endTotalUploadTimerIfActive();
-			});
-		});
-	});
 
 	let drawerOpen = $state(false);
 	let currentSpecies: string[] = $state(['all']);
@@ -56,7 +47,6 @@
 	});
 
 	let uniqueBirds: SvelteSet<EBirdEntry> = $derived.by(() => {
-		console.time('[timing] uniqueBirds dedup');
 		const dateFilteredBirds =
 			committedDateRange.start && committedDateRange.end
 				? birds.filter((bird) =>
@@ -71,12 +61,9 @@
 				seenNames.add(bird.commonName.trim().toWellFormed());
 			}
 		});
-		const result = new SvelteSet(seen.values());
-		console.timeEnd('[timing] uniqueBirds dedup');
-		return result;
+		return new SvelteSet(seen.values());
 	});
 	let filteredBirds: EBirdEntry[] = $derived.by(() => {
-		console.time('[timing] filteredBirds filter');
 		let newBirds = birds;
 		if (currentSpecies.indexOf('all') === -1) {
 			newBirds = newBirds.filter((bird) => currentSpecies.includes(bird.scientificName));
@@ -86,7 +73,6 @@
 			const end = committedDateRange.end;
 			newBirds = newBirds.filter((bird) => isInDateRange(bird.date, start, end));
 		}
-		console.timeEnd('[timing] filteredBirds filter');
 		return newBirds;
 	});
 

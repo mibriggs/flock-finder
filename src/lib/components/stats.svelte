@@ -13,17 +13,11 @@
 
 	let context = $state<ChartState>(null!);
 
-	const birdsSorted = $derived.by(() => {
-		console.time('[timing] stats: sort birds by date');
-		const sorted = birds.toSorted((a, b) => a.date.getTime() - b.date.getTime());
-		console.timeEnd('[timing] stats: sort birds by date');
-		return sorted;
-	});
+	const birdsSorted = $derived(birds.toSorted((a, b) => a.date.getTime() - b.date.getTime()));
 
 	// one point per calendar date (real dates, not bucketed) - multiple sightings on the
 	// same date collapse into a single point since bird.date has no time component
 	const accumulationCurveData = $derived.by(() => {
-		console.time('[timing] stats: build accumulationCurveData');
 		const seen = new Set<string>();
 		const byDate: { date: Date; cumulativeSpecies: number }[] = [];
 		for (const bird of birdsSorted) {
@@ -35,7 +29,6 @@
 				byDate.push({ date: bird.date, cumulativeSpecies: seen.size });
 			}
 		}
-		console.timeEnd('[timing] stats: build accumulationCurveData');
 		return byDate;
 	});
 

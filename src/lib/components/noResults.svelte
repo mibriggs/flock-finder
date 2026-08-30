@@ -15,7 +15,7 @@
 	</p>
 	<button
 		onclick={onReset}
-		class="mt-3 flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-xs transition-all hover:bg-slate-50 active:scale-90 active:bg-slate-100 active:shadow-none"
+		class="mt-3 flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-600 shadow-xs transition-all hover:bg-slate-50 active:scale-90 active:bg-slate-100 active:shadow-none"
 	>
 		<RotateCcw size={16} />
 		Load new file
