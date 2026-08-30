@@ -112,22 +112,29 @@
 	const allowedFiles: string[] = ['.csv'];
 </script>
 
-<main class="relative flex h-dvh w-full gap-3 p-8">
-	<div class={fileLoadTracker.loadComplete || fileLoadTracker.isSelected ? 'hide' : ''}>
-		<EBirdInstructions />
-		<FileDropZone
-			class="absolute bottom-[4%] left-1/2 w-[90vw] max-w-sm -translate-x-1/2"
-			allowedExtensions={allowedFiles}
-			onFileSelection={handleFileSelection}
-			bind:dropZoneContainer={filedDropZone}
-		/>
-		<p
-			class="absolute bottom-[1%] left-1/2 -translate-x-1/2 text-sm whitespace-nowrap text-slate-400"
-		>
-			or <button class="cursor-pointer underline hover:text-slate-600" onclick={loadDemo}
-				>try a demo</button
-			>
-		</p>
+<main class="relative flex h-dvh w-full p-4 sm:p-8">
+	<div
+		class="flex h-full w-full flex-col items-center justify-between gap-3 overflow-y-auto sm:gap-6 {fileLoadTracker.loadComplete ||
+		fileLoadTracker.isSelected
+			? 'hide'
+			: ''}"
+	>
+		<div class="flex flex-1 items-center justify-center">
+			<EBirdInstructions />
+		</div>
+		<div class="flex flex-col items-center gap-2 sm:gap-3">
+			<FileDropZone
+				class="w-full max-w-sm"
+				allowedExtensions={allowedFiles}
+				onFileSelection={handleFileSelection}
+				bind:dropZoneContainer={filedDropZone}
+			/>
+			<p class="text-sm whitespace-nowrap text-slate-400">
+				or <button class="cursor-pointer underline hover:text-slate-600" onclick={loadDemo}
+					>try a demo</button
+				>
+			</p>
+		</div>
 	</div>
 </main>
 

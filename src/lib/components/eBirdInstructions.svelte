@@ -1,16 +1,14 @@
-<div
-	class="absolute top-1/2 left-1/2 w-[90vw] max-w-md -translate-x-1/2 -translate-y-1/2 text-center"
->
-	<h1 class="text-3xl font-bold text-slate-800">Your bird sightings, on a map</h1>
-	<p class="mt-3 text-slate-500">
+<div class="w-full max-w-md text-center">
+	<h1 class="text-2xl font-bold text-slate-800 sm:text-3xl">Your bird sightings, on a map</h1>
+	<p class="mt-2 text-sm text-slate-500 sm:mt-3 sm:text-base">
 		Upload your eBird data to visualize every observation on an interactive map — filter by species,
 		date range, and more.
 	</p>
 	<div
-		class="mt-6 rounded-lg border border-slate-200 bg-white/70 px-5 py-4 text-left text-sm text-slate-600"
+		class="mt-3 rounded-lg border border-slate-200 bg-white/70 px-4 py-3 text-left text-sm text-slate-600 sm:mt-6 sm:px-5 sm:py-4"
 	>
 		<p class="font-semibold text-slate-700">How to get your data</p>
-		<ol class="mt-2 flex list-inside list-decimal flex-col gap-1.5">
+		<ol class="mt-2 flex list-inside list-decimal flex-col gap-1 sm:gap-1.5">
 			<li>
 				Log in to your <span class="border-b border-dotted border-slate-700 font-medium"
 					><a
