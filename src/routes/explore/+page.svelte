@@ -27,11 +27,23 @@
 			goto('/?uploadError=true', { replaceState: true });
 		});
 	});
+
+	let showLoading = $state(false);
+
+	$effect(() => {
+		showLoading = false;
+		const timeout = setTimeout(() => {
+			showLoading = true;
+		}, 50);
+		return () => clearTimeout(timeout);
+	});
 </script>
 
 <main class="relative flex h-dvh w-full gap-3 p-8">
 	{#await data.birds}
-		<BirdLoadingScreen />
+		{#if showLoading}
+			<BirdLoadingScreen />
+		{/if}
 	{:then birds}
 		<ExploreContent {birds} taxonomyMap={data.taxonomyMap} />
 	{:catch}
