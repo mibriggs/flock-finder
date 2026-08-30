@@ -1,4 +1,4 @@
-import { readCsvFile } from '$lib';
+import { readCsvFileInWorker } from '$lib';
 import { loadCsv, clearCsv } from '$lib/csvStore';
 import type { EBirdEntry } from '$lib/eBirdEntry';
 import type { PageLoad } from './$types';
@@ -15,7 +15,7 @@ export const load: PageLoad = ({ fetch, data }) => {
 			csvData = csv;
 		}
 
-		const { object: birdData, error } = readCsvFile(csvData);
+		const { object: birdData, error } = await readCsvFileInWorker(csvData);
 
 		if (error) {
 			console.error(error);

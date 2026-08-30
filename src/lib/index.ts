@@ -7,6 +7,7 @@ import type { FeatureCollection, Feature, GeoJsonProperties, Point } from 'geojs
 import birdImage from '$lib/assets/birdNoBg.png';
 import { Time, type DateValue } from '@internationalized/date';
 import { browser } from '$app/environment';
+import type { CsvParseWorkerResult } from './csvParse.worker';
 
 export const MAP_PANEL_CONTEXT = Symbol('mapPanel');
 export const SATELITE_MAP_CONTEXT = Symbol('sateliteMap');
@@ -157,6 +158,30 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 		console.error(error);
 		return { object: [], error: new Error('An error occurred when parsing the csv.') };
 	}
+}
+
+export function readCsvFileInWorker(csvData: string): Promise<ObjectOrError<EBirdEntry[]>> {
+	return new Promise((resolve, reject) => {
+		const worker = new Worker(new URL('./csvParse.worker.ts', import.meta.url), {
+			type: 'module'
+		});
+
+		worker.onmessage = (event: MessageEvent<CsvParseWorkerResult>) => {
+			worker.terminate();
+			if (event.data.ok) {
+				resolve({ object: event.data.object ?? [] });
+			} else {
+				resolve({ object: [], error: new Error(event.data.message) });
+			}
+		};
+
+		worker.onerror = (event) => {
+			worker.terminate();
+			reject(new Error(event.message));
+		};
+
+		worker.postMessage(csvData);
+	});
 }
 
 export async function addMarkersToMap(birds: EBirdEntry[], map: Map) {
