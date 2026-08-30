@@ -136,8 +136,7 @@ export function readCsvFile(csvData: string): ObjectOrError<EBirdEntry[]> {
 			const unsolvedErrors = results.errors.filter((error) => {
 				const rowIndex = error.row ? error.row : 0;
 				const isSolved =
-					error.code === 'TooFewFields' &&
-					Object.keys(newData[rowIndex]).length === keys.length;
+					error.code === 'TooFewFields' && Object.keys(newData[rowIndex]).length === keys.length;
 				return !isSolved;
 			});
 			actualUnsolvedErrors = unsolvedErrors.length;

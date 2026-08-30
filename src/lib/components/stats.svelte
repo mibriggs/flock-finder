@@ -11,7 +11,6 @@
 
 	let { birds = [] }: Props = $props();
 
-
 	let context = $state<ChartState>(null!);
 
 	const birdsSorted = $derived.by(() => {
@@ -41,13 +40,9 @@
 	});
 
 	const xDomain = $derived(extent(accumulationCurveData, (d) => d.date) as [Date, Date]);
-	const maxCumulative = $derived(
-		accumulationCurveData.at(-1)?.cumulativeSpecies ?? 0
-	);
+	const maxCumulative = $derived(accumulationCurveData.at(-1)?.cumulativeSpecies ?? 0);
 	// rough estimate: ~7px per character plus a little breathing room
-	const leftPadding = $derived(
-		Math.max(25, `${maxCumulative.toLocaleString()}`.length * 7 + 10)
-	);
+	const leftPadding = $derived(Math.max(25, `${maxCumulative.toLocaleString()}`.length * 7 + 10));
 </script>
 
 <div class="flex w-full flex-col gap-2.5">
