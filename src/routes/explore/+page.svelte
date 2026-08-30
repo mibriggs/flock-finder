@@ -28,22 +28,22 @@
 		});
 	});
 
-	// let showLoading = $state(false);
+	let showLoading = $state(false);
 
-	// $effect(() => {
-	// 	showLoading = false;
-	// 	const timeout = setTimeout(() => {
-	// 		showLoading = true;
-	// 	}, 75);
-	// 	return () => clearTimeout(timeout);
-	// });
+	$effect(() => {
+		showLoading = false;
+		const timeout = setTimeout(() => {
+			showLoading = true;
+		}, 75);
+		return () => clearTimeout(timeout);
+	});
 </script>
 
 <main class="relative flex h-dvh w-full gap-3 p-8">
 	{#await data.birds}
-		<!-- {#if showLoading} -->
-		<BirdLoadingScreen />
-		<!-- {/if} -->
+		{#if showLoading}
+			<BirdLoadingScreen />
+		{/if}
 	{:then birds}
 		<ExploreContent {birds} taxonomyMap={data.taxonomyMap} />
 	{:catch}

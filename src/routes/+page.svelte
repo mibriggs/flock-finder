@@ -7,7 +7,7 @@
 		SATELITE_MAP_CONTEXT,
 		getCookie
 	} from '$lib';
-	import { saveCsv } from '$lib/csvStore';
+	import { saveCsv, clearCsv } from '$lib/csvStore';
 	import { browser } from '$app/environment';
 	import FileDropZone from '$lib/components/fileDropZone.svelte';
 	import { fileLoadTracker } from '$lib/fileLoadingEvent.svelte';
@@ -97,6 +97,7 @@
 	};
 
 	const loadDemo = async () => {
+		await clearCsv();
 		goto('/explore');
 	};
 
