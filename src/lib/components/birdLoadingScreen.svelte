@@ -15,11 +15,12 @@
 	.bird-sprite {
 		width: 576px; /* native sheet (288x48) scaled 2x */
 		height: 96px;
-		background-image: url('/Sacred\ Kingfisher\ flying-Sheet.png');
+		background-image: url('/sacred_kingfisher.png');
 		background-repeat: no-repeat;
 		background-size: 576px 96px;
 		animation: flap 0.8s steps(6) infinite;
 		will-change: transform;
+		image-rendering: pixelated;
 	}
 
 	@keyframes flap {
