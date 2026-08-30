@@ -34,7 +34,7 @@
 		showLoading = false;
 		const timeout = setTimeout(() => {
 			showLoading = true;
-		}, 50);
+		}, 75);
 		return () => clearTimeout(timeout);
 	});
 </script>
